@@ -9,11 +9,16 @@
 
 @interface QhDownloadOperation()
 
-@property (nonatomic, assign, getter=isExecuting) BOOL executing;
-@property (nonatomic, assign, getter=isFinished) BOOL finished;
+@property (assign, nonatomic, getter=isExecuting) BOOL executing;
+@property (assign, nonatomic, getter=isFinished) BOOL finished;
 
-@property (nonatomic, copy) NSString *imageUrlStr;
-@property (nonatomic, copy) DownloadCompletionHandler completionHandler;
+@property (copy, nonatomic) NSString *imageUrlStr;
+@property (copy, nonatomic) NSURLSessionDownloadTask *downloadTask;
+@property (strong, nonatomic, nullable) NSURLSession *session;
+
+@property (copy, nonatomic) DownloadCompletionHandler completionHandler;
+@property (assign, nonatomic) BOOL backgroundSupport;
+@property (assign, nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
 @end
 
@@ -22,36 +27,62 @@
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 
-- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr withCompletionHandler:(DownloadCompletionHandler)completionHandler {
+- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(DownloadCompletionHandler)completionHandler{
 
     if(self = [super init]){
-        
-        self.imageUrlStr = imageUrlStr;
+        _backgroundSupport = background;
+        _imageUrlStr = imageUrlStr;
         if(completionHandler){
-            self.completionHandler = completionHandler;
+            _completionHandler = completionHandler;
         }
     }
-    
     return  self;
 }
 
 - (void)start{
     
-    self.executing = YES;
     NSLog(@"开始执行任务%@ thread===%@",self.imageUrlStr,[NSThread currentThread]);
-   
+    NSLog(@"self.isCancelled====%d",self.isCancelled);
+    NSLog(@"self=================%@",self);
+
     if (self.isCancelled){
         self.executing = NO;
         self.finished = YES;
+        self.downloadTask = nil;
         return;
     }
     
+    Class UIApplicationClass = NSClassFromString(@"UIApplication");
+    BOOL hasApplication = UIApplicationClass && [UIApplicationClass respondsToSelector:@selector(sharedApplication)];
+    if (hasApplication && self.backgroundSupport) {
+        __weak __typeof__ (self) wself = self;
+        UIApplication * app = [UIApplicationClass performSelector:@selector(sharedApplication)];
+        self.backgroundTaskId = [app beginBackgroundTaskWithExpirationHandler:^{
+            __strong __typeof (wself) sself = wself;
+
+            if (sself) {
+                [sself cancel];
+                [app endBackgroundTask:sself.backgroundTaskId];
+                sself.backgroundTaskId = UIBackgroundTaskInvalid;
+            }
+        }];
+    }
     __weak typeof(self) weakSelf = self;
 
     NSURL *url = [NSURL URLWithString:self.imageUrlStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithRequest:request completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    if(!self.session){
+        // 后台下载标识
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        configuration.timeoutIntervalForRequest = 15;
+        // 允许蜂窝网络下载，默认为YES，这里开启，我们添加了一个变量去控制用户切换选择
+        configuration.allowsCellularAccess = YES;
+        
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+        self.session = session;
+    }
+    
+    self.downloadTask = [self.session downloadTaskWithRequest:request completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if(error == nil){
             //默认把数据写到磁盘中：tmp/...随时可能被删除
             NSLog(@"location= %@", location);
@@ -65,10 +96,17 @@
         } else {
             weakSelf.completionHandler(NO, nil, error);
         }
-        weakSelf.executing = NO;
-        weakSelf.finished = YES;
+        [weakSelf done];
     }];
-    [downloadTask resume];
+    self.executing = YES;
+
+    if(self.downloadTask) {
+        [self.downloadTask resume];
+    } else {
+        self.completionHandler(NO, nil, [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:@{NSLocalizedDescriptionKey : @"Task can't be initialized"}]);
+        [self done];
+        return;
+    }
 }
 
 - (void)setExecuting:(BOOL )executing{
@@ -83,6 +121,45 @@
     return _executing;
 }
 
+- (void)done {
+    NSLog(@"---------------------->");
+    
+    Class UIApplicationClass = NSClassFromString(@"UIApplication");
+    if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
+        return;
+    }
+    if (self.backgroundTaskId != UIBackgroundTaskInvalid) {
+        UIApplication * app = [UIApplication performSelector:@selector(sharedApplication)];
+        [app endBackgroundTask:self.backgroundTaskId];
+        self.backgroundTaskId = UIBackgroundTaskInvalid;
+    }
+    self.finished = YES;
+    self.executing = NO;
+}
+
+- (void)cancel {
+    @synchronized (self) {
+        [self cancelDownLoad];
+    }
+}
+
+- (void)cancelDownLoad {
+        
+    if (self.isFinished) return;
+    [super cancel];
+
+    if (self.downloadTask) {
+        [self.downloadTask cancel];
+        self.downloadTask = nil;
+        [self done];
+    }
+    
+    if (self.session) {
+        [self.session invalidateAndCancel];
+        self.session = nil;
+    }
+}
+
 - (void)setFinished:(BOOL )finished{
    
     [self willChangeValueForKey:@"isFinished"];
@@ -91,11 +168,11 @@
 }
 
 - (BOOL)isFinished{
-   
+    
     return _finished;
 }
 
-- (BOOL)isAsynchronous{
+- (BOOL)isConcurrent {
     
     return YES;
 }

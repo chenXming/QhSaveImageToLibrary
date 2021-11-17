@@ -12,8 +12,11 @@
 
 @interface QhSavePicToPhotoLibrary ()
 //自定义相册
-@property (nonatomic, strong) PHAssetCollection *createCollection;
-@property (nonatomic, strong) NSMutableArray    *imagePathList;
+@property (strong, nonatomic, nonnull) PHAssetCollection *createCollection;
+@property (strong, nonatomic, nonnull) NSMutableArray    *imagePathList;
+@property (strong, nonatomic, nonnull) NSOperationQueue  *downloadQueue;
+@property (strong, nonatomic, nonnull) NSMutableArray    *downloadOptionList;
+
 @end
 
 @implementation QhSavePicToPhotoLibrary
@@ -23,7 +26,10 @@
     if (self) {
         self.maxConcurrentDownloadCount = 5;
         self.deleteDownloadImageCache = YES;
+        self.backgroundDownloadSupport = YES;
         self.imagePathList = [[NSMutableArray alloc] initWithCapacity:0];
+        self.downloadOptionList = [[NSMutableArray alloc] initWithCapacity:0];
+
     }
     return self;
 }
@@ -49,38 +55,60 @@
     
     __weak QhSavePicToPhotoLibrary *wself = self;
 
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    queue.maxConcurrentOperationCount = self.maxConcurrentDownloadCount;
+    self.downloadQueue = [[NSOperationQueue alloc] init];
+    self.downloadQueue.maxConcurrentOperationCount = self.maxConcurrentDownloadCount;
     
     NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
-        NSLog(@"----->");
 
-        NSMutableArray *cacheImageList = [NSMutableArray array];
-        [self.imagePathList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSString *filePath = (NSString*)obj;
-            [cacheImageList addObject:[UIImage imageWithContentsOfFile:filePath]];
-        }];
-        
-        [self saveImageToPhotoLibraryWithImageList:cacheImageList andLibraryName:libryName callBack:^(BOOL success) {
-            NSLog(@"存储成功");
-            [cacheImageList removeAllObjects];
-            [wself saveSuccessImageWithCompletionHandler:completionHandler];
-        }];
+        [self backgroundSaveImageAndDeleteOldFilesWithLibraryName:libryName callBack:completionHandler];
     }];
 
     for (NSInteger i = 0; i < imageUrlList.count; i++) {
-        QhDownloadOperation *task = [[QhDownloadOperation alloc] initWithImageUrlStr:[NSString stringWithFormat:@"%@",imageUrlList[i]] withCompletionHandler:^(BOOL success, NSString * _Nullable filePath, NSError * _Nullable error) {
-            
+        QhDownloadOperation *task = [[QhDownloadOperation alloc] initWithImageUrlStr:[NSString stringWithFormat:@"%@",imageUrlList[i]] backgroundSupport:self.backgroundDownloadSupport withCompletionHandler:^(BOOL success, NSString * _Nullable filePath, NSError * _Nullable error) {
             __strong __typeof (wself) sself = wself;
             
             if(success && filePath != nil){
                 [sself.imagePathList addObject:filePath];
             }
         }];
-        [queue addOperation:task];
+        [self.downloadQueue addOperation:task];
         [finalTask addDependency:task];
+        NSLog(@"task=====%@",task);
+        [self.downloadOptionList addObject:task];
     }
-    [queue addOperation:finalTask];
+    [self.downloadQueue addOperation:finalTask];
+}
+
+/**
+ * 后台保存任务
+ */
+- (void)backgroundSaveImageAndDeleteOldFilesWithLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler {
+    
+    __weak QhSavePicToPhotoLibrary *wself = self;
+
+    Class UIApplicationClass = NSClassFromString(@"UIApplication");
+    if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
+        return;
+    }
+    UIApplication *application = [UIApplication performSelector:@selector(sharedApplication)];
+    __block UIBackgroundTaskIdentifier bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
+
+    NSMutableArray *cacheImageList = [NSMutableArray array];
+    [self.imagePathList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSString *filePath = (NSString*)obj;
+        [cacheImageList addObject:[UIImage imageWithContentsOfFile:filePath]];
+    }];
+    
+    [self saveImageToPhotoLibraryWithImageList:cacheImageList andLibraryName:libryName callBack:^(BOOL success) {
+        NSLog(@"存储成功");
+        [cacheImageList removeAllObjects];
+        [wself saveSuccessImageWithCompletionHandler:completionHandler];
+        [application endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }];
 }
 
 - (void)saveImageToPhotoWithRequestAuthorizationWithImageList:(NSArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler{
@@ -219,5 +247,18 @@
     return appCollection;
 }
 
+/**
+ * 取消所有下载任务
+ */
+- (void)cancelAllDownloads {
+    
+    if(self.downloadQueue){
+        [self.downloadQueue cancelAllOperations];
+    }
+}
 
+- (void)dealloc {
+ 
+    [self.downloadQueue cancelAllOperations];
+}
 @end

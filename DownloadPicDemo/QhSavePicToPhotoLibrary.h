@@ -27,6 +27,12 @@ typedef void(^SaveCompletionHandler)(BOOL success);
 @property (nonatomic, assign) BOOL deleteDownloadImageCache;
 
 /**
+ * 是否需要后台下载网络图片
+ * default = YES
+ */
+@property (nonatomic, assign) BOOL backgroundDownloadSupport;
+
+/**
  * @brief 保存本地图片到相册
  * @param imageList 图片数组
  * @param libryName 相册名称，传空则保存到系统相册
@@ -35,13 +41,17 @@ typedef void(^SaveCompletionHandler)(BOOL success);
 - (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler;
 
 /**
- * @brief 保存网络图片到相册
+ * @brief 下载网络图片到相册
  * @param imageUrlList 图片url数组
  * @param libryName 相册名称，传空则保存到系统相册
  * @param completionHandler 保存后回调
  */
 - (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSURL *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler;
 
+/**
+ * 取消所有下载任务
+ */
+- (void)cancelAllDownloads;
 @end
 
 NS_ASSUME_NONNULL_END

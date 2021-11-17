@@ -11,6 +11,8 @@
 
 @interface ViewController ()
 
+@property(strong, nonatomic, nonnull) QhSavePicToPhotoLibrary *savePic;
+
 @end
 
 @implementation ViewController
@@ -19,6 +21,26 @@
     [super viewDidLoad];
     
     NSLog(@"%s",__func__);
+}
+- (IBAction)clickDown:(id)sender {
+    
+    NSLog(@"=========");
+    NSArray *imageUrlList = @[[NSURL URLWithString:@"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/pdF3jiDGTxLUPhl.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/OgBpvVI9L6X3qds.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/pdF3jiDGTxLUPhl.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/OgBpvVI9L6X3qds.jpg"],
+                              [NSURL URLWithString:@"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg"]];
+    
+    self.savePic = [[QhSavePicToPhotoLibrary alloc] init];
+    self.savePic.maxConcurrentDownloadCount = 1;
+    [self.savePic saveOnLineImageToPhotoLibraryWithImageList:imageUrlList andLibraryName:@"测试2" callBack:^(BOOL success) {
+        NSLog(@"success=========>>>>%d",success);
+    }];
 }
 
 - (IBAction)downloadClick:(id)sender {
@@ -42,15 +64,16 @@
                               [NSURL URLWithString:@"https://i.loli.net/2021/11/02/OgBpvVI9L6X3qds.jpg"],
                               [NSURL URLWithString:@"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg"]];
     
-    QhSavePicToPhotoLibrary *savePic = [[QhSavePicToPhotoLibrary alloc] init];
-    savePic.maxConcurrentDownloadCount = 5;
-    [savePic saveOnLineImageToPhotoLibraryWithImageList:imageUrlList andLibraryName:@"" callBack:^(BOOL success) {
+    self.savePic = [[QhSavePicToPhotoLibrary alloc] init];
+    self.savePic.maxConcurrentDownloadCount = 1;
+    [self.savePic saveOnLineImageToPhotoLibraryWithImageList:imageUrlList andLibraryName:@"测试2" callBack:^(BOOL success) {
         NSLog(@"success=========>>>>%d",success);
     }];
 }
-
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    NSLog(@"下载");
-   
+- (IBAction)cancelDownImage:(id)sender {
+    
+    NSLog(@"%s",__func__);
+    [self.savePic cancelAllDownloads];
 }
+
 @end

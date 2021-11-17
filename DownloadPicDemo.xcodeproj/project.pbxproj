@@ -18,6 +18,8 @@
 		5F23BCA0272BFAA9008CD3C2 /* 0004.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5F23BC9B272BFAA9008CD3C2 /* 0004.jpg */; };
 		5F23BCA4273148EB008CD3C2 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5F23BCA3273148EB008CD3C2 /* ViewController.xib */; };
 		5F279A9127265A22000BC96A /* QhSavePicToPhotoLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F279A9027265A22000BC96A /* QhSavePicToPhotoLibrary.m */; };
+		5F83AF1B273E55BB00CD2758 /* NextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F83AF19273E55BB00CD2758 /* NextViewController.m */; };
+		5F83AF1C273E55BB00CD2758 /* NextViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5F83AF1A273E55BB00CD2758 /* NextViewController.xib */; };
 		5FFBCC202721612B0080F7AE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FFBCC1F2721612B0080F7AE /* AppDelegate.m */; };
 		5FFBCC262721612B0080F7AE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FFBCC252721612B0080F7AE /* ViewController.m */; };
 		5FFBCC292721612B0080F7AE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5FFBCC272721612B0080F7AE /* Main.storyboard */; };
@@ -58,6 +60,9 @@
 		5F23BCA3273148EB008CD3C2 /* ViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ViewController.xib; sourceTree = "<group>"; };
 		5F279A8F27265A22000BC96A /* QhSavePicToPhotoLibrary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QhSavePicToPhotoLibrary.h; sourceTree = "<group>"; };
 		5F279A9027265A22000BC96A /* QhSavePicToPhotoLibrary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QhSavePicToPhotoLibrary.m; sourceTree = "<group>"; };
+		5F83AF18273E55BB00CD2758 /* NextViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NextViewController.h; sourceTree = "<group>"; };
+		5F83AF19273E55BB00CD2758 /* NextViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NextViewController.m; sourceTree = "<group>"; };
+		5F83AF1A273E55BB00CD2758 /* NextViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NextViewController.xib; sourceTree = "<group>"; };
 		5FFBCC1B2721612B0080F7AE /* DownloadPicDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DownloadPicDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5FFBCC1E2721612B0080F7AE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		5FFBCC1F2721612B0080F7AE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -166,6 +171,9 @@
 			children = (
 				5FFBCC1E2721612B0080F7AE /* AppDelegate.h */,
 				5FFBCC1F2721612B0080F7AE /* AppDelegate.m */,
+				5F83AF18273E55BB00CD2758 /* NextViewController.h */,
+				5F83AF19273E55BB00CD2758 /* NextViewController.m */,
+				5F83AF1A273E55BB00CD2758 /* NextViewController.xib */,
 				5FFBCC242721612B0080F7AE /* ViewController.h */,
 				5FFBCC252721612B0080F7AE /* ViewController.m */,
 				5F23BCA3273148EB008CD3C2 /* ViewController.xib */,
@@ -318,6 +326,7 @@
 				5F23BC9C272BFAA9008CD3C2 /* 00006.jpg in Resources */,
 				5FFBCC2B2721612D0080F7AE /* Assets.xcassets in Resources */,
 				5F23BCA4273148EB008CD3C2 /* ViewController.xib in Resources */,
+				5F83AF1C273E55BB00CD2758 /* NextViewController.xib in Resources */,
 				5FFBCC292721612B0080F7AE /* Main.storyboard in Resources */,
 				5F23BC9D272BFAA9008CD3C2 /* 0005.jpg in Resources */,
 				5F23BC96272BDF99008CD3C2 /* 003.jpg in Resources */,
@@ -392,6 +401,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5FFBCC262721612B0080F7AE /* ViewController.m in Sources */,
+				5F83AF1B273E55BB00CD2758 /* NextViewController.m in Sources */,
 				5FFBCC202721612B0080F7AE /* AppDelegate.m in Sources */,
 				5FFBCC312721612D0080F7AE /* main.m in Sources */,
 				5F279A9127265A22000BC96A /* QhSavePicToPhotoLibrary.m in Sources */,
