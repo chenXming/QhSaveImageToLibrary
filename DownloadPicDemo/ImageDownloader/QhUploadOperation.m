@@ -51,9 +51,6 @@
 }
 
 - (void)start{
-    
-    NSLog(@"开始执行任务%@ thread===%@",self.imageLocalUrl,[NSThread currentThread]);
-    NSLog(@"self.isCancelled====%d",self.isCancelled);
 
     if (self.isCancelled){
         self.executing = NO;
@@ -62,10 +59,12 @@
         return;
     }
 
+    __weak __typeof__ (self) wself = self;
+
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
     BOOL hasApplication = UIApplicationClass && [UIApplicationClass respondsToSelector:@selector(sharedApplication)];
+   
     if (hasApplication && self.backgroundSupport) {
-        __weak __typeof__ (self) wself = self;
         UIApplication * app = [UIApplicationClass performSelector:@selector(sharedApplication)];
         self.backgroundTaskId = [app beginBackgroundTaskWithExpirationHandler:^{
             __strong __typeof (wself) sself = wself;
@@ -77,7 +76,6 @@
             }
         }];
     }
-    __weak typeof(self) weakSelf = self;
 
     NSURL *url = [NSURL URLWithString:_serveIp];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
@@ -96,16 +94,19 @@
     NSData *uploadData = [self getUploadDataWithParameter:_serveFileParameter];
     self.uploadTask = [self.session uploadTaskWithRequest:request fromData:uploadData completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
+        __strong __typeof (wself) sself = wself;
+
         if(error == nil) {
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
             NSLog(@"jsonDict==%@",jsonDict);
-            if(weakSelf.completionHandler){
-                weakSelf.completionHandler(YES, nil);
+            if(sself.completionHandler){
+                sself.completionHandler(YES, nil);
             }
         } else {
-            weakSelf.completionHandler(NO, error);
+            sself.completionHandler(NO, error);
         }
-        [weakSelf done];
+        
+        [sself done];
     }];
     
     self.executing = YES;
@@ -118,7 +119,9 @@
         return;
     }
 }
-
+/**
+ * 拼接上传数据
+ */
 - (NSData*)getUploadDataWithParameter:(NSString *)serveFileParameter{
     
     NSMutableData *data = [NSMutableData data];

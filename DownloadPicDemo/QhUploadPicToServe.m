@@ -43,6 +43,7 @@
     
     NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
         NSLog(@"所有图片上传成功");
+        __strong __typeof (wself) sself = wself;
        // [self backgroundSaveImageAndDeleteOldFilesWithLibraryName:libryName callBack:completionHandler];
     }];
 
@@ -52,7 +53,6 @@
         }];
         [self.uploadQueue addOperation:task];
         [finalTask addDependency:task];
-        NSLog(@"task=====%@",task);
     }
     
     [self.uploadQueue addOperation:finalTask];
@@ -62,7 +62,10 @@
  * 取消所有上传任务
  */
 - (void)cancelAllUpload {
-    
+   
+    if(self.uploadQueue){
+        [self.uploadQueue cancelAllOperations];
+    }
 }
 
 @end
