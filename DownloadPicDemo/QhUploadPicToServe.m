@@ -6,11 +6,10 @@
 //
 
 #import "QhUploadPicToServe.h"
-#import "ImageDownloader/QhUploadOperation.h"
+#import "QhImageLoaderOperation/QhUploadOperation.h"
 
 @interface QhUploadPicToServe()
 
-@property (strong, nonatomic, nonnull) NSMutableArray    *imagePathList;
 @property (strong, nonatomic, nonnull) NSOperationQueue  *uploadQueue;
 
 @end
@@ -22,7 +21,6 @@
     if (self) {
         self.maxConcurrentUploadCount = 5;
         self.backgroundUploadSupport = YES;
-        self.imagePathList = [[NSMutableArray alloc] initWithCapacity:0];
     }
     return self;
 }
@@ -40,12 +38,12 @@
     NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
         NSLog(@"所有图片上传成功");
         __strong __typeof (wself) sself = wself;
-        [sself allImageUploadComplate:completionHandler];
+        [self allImageUploadComplate:completionHandler];
     }];
 
     for (NSInteger i = 0; i < imagePathList.count; i++) {
         QhUploadOperation *task = [[QhUploadOperation alloc] initWithServeIp:serveIp andServeFileParameter:serveFileParameter andImageUrlStr:imagePathList[i] backgroundSupport:self.backgroundUploadSupport withCompletionHandler:^(BOOL success, NSError * _Nullable error) {
-            
+
             if(success){
                 NSLog(@"上传成功");
             }
@@ -53,7 +51,6 @@
         [self.uploadQueue addOperation:task];
         [finalTask addDependency:task];
     }
-    
     [self.uploadQueue addOperation:finalTask];
 }
 

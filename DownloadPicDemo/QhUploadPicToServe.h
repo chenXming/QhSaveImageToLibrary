@@ -14,7 +14,7 @@ typedef void(^LoadCompletionHandler)(BOOL success);
 @interface QhUploadPicToServe : NSObject
 
 /**
- * 网络图片最大上传数量
+ * 网络图片最大同时上传数量
  * default = 5
  */
 @property (nonatomic, assign) NSInteger maxConcurrentUploadCount;

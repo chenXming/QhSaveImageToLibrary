@@ -6,7 +6,7 @@
 //
 
 #import "QhSavePicToPhotoLibrary.h"
-#import "ImageDownloader/QhDownloadOperation.h"
+#import "QhImageLoaderOperation/QhDownloadOperation.h"
 #import <Photos/Photos.h>
 
 

@@ -6,7 +6,6 @@
 //
 
 #import "ViewController.h"
-#import "ImageDownloader/QhDownloadOperation.h"
 #import "QhSavePicToPhotoLibrary.h"
 #import "QhUploadPicToServe.h"
 
@@ -62,7 +61,7 @@
 //    [self.savePic cancelAllDownloads];
     
     NSString *imageBundle = [[NSBundle mainBundle] pathForResource:@"test001" ofType:@"png"];
-    NSArray *imageArr = @[imageBundle,imageBundle,imageBundle,imageBundle];
+    NSArray *imageArr = @[imageBundle];
     QhUploadPicToServe *upload = [[QhUploadPicToServe alloc] init];
     upload.maxConcurrentUploadCount = 4;
     

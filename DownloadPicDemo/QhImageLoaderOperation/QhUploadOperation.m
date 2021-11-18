@@ -6,6 +6,7 @@
 //
 
 #import "QhUploadOperation.h"
+#import "UIImage+ImageContent.h"
 
 //分隔符
 #define Boundary @"QhUploadImage"
@@ -40,9 +41,10 @@
 
     if(self = [super init]){
         _serveIp = serveIp;
-        _backgroundSupport = background;
         _imageLocalUrl = imageLocalUrl;
+        _backgroundSupport = background;
         _serveFileParameter = serveFileParameter;
+        
         if(completionHandler){
             _completionHandler = completionHandler;
         }
@@ -52,7 +54,7 @@
 
 - (void)start{
 
-    if (self.isCancelled){
+    if (self.isCancelled) {
         self.executing = NO;
         self.finished = YES;
         self.uploadTask = nil;
@@ -119,6 +121,7 @@
         return;
     }
 }
+
 /**
  * 拼接上传数据
  */
@@ -128,24 +131,34 @@
     [data appendData:Encode(@"--")];
     [data appendData:Encode(Boundary)];
     [data appendData:Enter];
-    NSString *imageName = [NSString stringWithFormat:@"Content-Disposition:form-data; name=\"%@\"; filename=\"test001.png\"",serveFileParameter];
-    [data appendData:Encode(imageName)];
+    NSString *imageContent = [NSString stringWithFormat:@"Content-Disposition:form-data; name=\"%@\"; filename=\"%@\"",serveFileParameter,[self getImageFileName]];
+    [data appendData:Encode(imageContent)];
     [data appendData:Enter];
     [data appendData:Encode(@"Content-Type:image/png")];
     [data appendData:Enter];
     [data appendData:Enter];
-    //图片数据  并且转换为Data
-    UIImage *image = [UIImage imageWithContentsOfFile:self.imageLocalUrl];
-    NSData *imagedata = UIImagePNGRepresentation(image);
-    [data appendData:imagedata];
+    UIImage * image = [UIImage imageWithContentsOfFile:self.imageLocalUrl];
+    NSData *imageData = [UIImage getDataWithImage:image];
+    [data appendData:imageData];
     [data appendData:Enter];
-    //3、结束标记
     [data appendData:Encode(@"--")];
     [data appendData:Encode(Boundary)];
     [data appendData:Encode(@"--")];
     [data appendData:Enter];
     
     return data;
+}
+
+- (NSString *)getImageFileName{
+    
+    NSString *fileName = @"qhImage.png";
+    if(self.imageLocalUrl == nil) return fileName;
+    
+    NSArray *fileNameArr = [self.imageLocalUrl componentsSeparatedByString:@"/"];
+    if(fileNameArr.count > 0){
+        fileName = [fileNameArr lastObject];
+    }
+    return  fileName;
 }
 - (void)setExecuting:(BOOL )executing{
 
