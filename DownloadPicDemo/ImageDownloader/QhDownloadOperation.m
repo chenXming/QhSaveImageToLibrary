@@ -41,10 +41,6 @@
 
 - (void)start{
     
-    NSLog(@"开始执行任务%@ thread===%@",self.imageUrlStr,[NSThread currentThread]);
-    NSLog(@"self.isCancelled====%d",self.isCancelled);
-    NSLog(@"self=================%@",self);
-
     if (self.isCancelled){
         self.executing = NO;
         self.finished = YES;
@@ -122,7 +118,6 @@
 }
 
 - (void)done {
-    NSLog(@"---------------------->");
     
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
     if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
@@ -138,6 +133,7 @@
 }
 
 - (void)cancel {
+    
     @synchronized (self) {
         [self cancelDownLoad];
     }

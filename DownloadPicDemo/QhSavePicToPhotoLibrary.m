@@ -15,7 +15,6 @@
 @property (strong, nonatomic, nonnull) PHAssetCollection *createCollection;
 @property (strong, nonatomic, nonnull) NSMutableArray    *imagePathList;
 @property (strong, nonatomic, nonnull) NSOperationQueue  *downloadQueue;
-@property (strong, nonatomic, nonnull) NSMutableArray    *downloadOptionList;
 
 @end
 
@@ -28,8 +27,6 @@
         self.deleteDownloadImageCache = YES;
         self.backgroundDownloadSupport = YES;
         self.imagePathList = [[NSMutableArray alloc] initWithCapacity:0];
-        self.downloadOptionList = [[NSMutableArray alloc] initWithCapacity:0];
-
     }
     return self;
 }
@@ -74,7 +71,6 @@
         [self.downloadQueue addOperation:task];
         [finalTask addDependency:task];
         NSLog(@"task=====%@",task);
-        [self.downloadOptionList addObject:task];
     }
     [self.downloadQueue addOperation:finalTask];
 }
@@ -189,19 +185,16 @@
         [self saveImageListToLibrary:imageList andLibraryNmae:libryName andSaveCallBack:completionHandler];
     }];
 }
+
 /**
  * 保存成功后的回调
  */
 - (void)saveSuccessImageWithCompletionHandler:(SaveCompletionHandler)completionHandler {
     
     if (self.deleteDownloadImageCache) { //删除下载缓存数据
-        [self.imagePathList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [[NSFileManager defaultManager] removeItemAtPath:(NSString *)obj error:nil];
-        }];
+        [self delateOldFiles];
     }
-    
-    [self.imagePathList removeAllObjects];
-    
+        
     if(completionHandler){
         completionHandler(YES);
     }
@@ -254,6 +247,18 @@
     
     if(self.downloadQueue){
         [self.downloadQueue cancelAllOperations];
+    }
+    
+    [self delateOldFiles];
+}
+
+- (void)delateOldFiles {
+    
+    if(self.imagePathList.count > 0){
+        [self.imagePathList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [[NSFileManager defaultManager] removeItemAtPath:(NSString *)obj error:nil];
+        }];
+        [self.imagePathList removeAllObjects];
     }
 }
 
