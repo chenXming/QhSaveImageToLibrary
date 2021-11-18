@@ -67,22 +67,18 @@
 
     NSURL *url = [NSURL URLWithString:self.imageUrlStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    
     if(!self.session){
-        // 后台下载标识
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
         configuration.timeoutIntervalForRequest = 15;
-        // 允许蜂窝网络下载，默认为YES，这里开启，我们添加了一个变量去控制用户切换选择
         configuration.allowsCellularAccess = YES;
-        
         NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
         self.session = session;
     }
     
     self.downloadTask = [self.session downloadTaskWithRequest:request completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        
         if(error == nil){
-            //默认把数据写到磁盘中：tmp/...随时可能被删除
-            NSLog(@"location= %@", location);
-            //转移文件
             NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)  lastObject];
             NSString *filePath = [cache stringByAppendingPathComponent:response.suggestedFilename];
             NSLog(@"filePath = %@",filePath);
@@ -120,14 +116,17 @@
 - (void)done {
     
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
+    
     if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
         return;
     }
+    
     if (self.backgroundTaskId != UIBackgroundTaskInvalid) {
         UIApplication * app = [UIApplication performSelector:@selector(sharedApplication)];
         [app endBackgroundTask:self.backgroundTaskId];
         self.backgroundTaskId = UIBackgroundTaskInvalid;
     }
+    
     self.finished = YES;
     self.executing = NO;
 }

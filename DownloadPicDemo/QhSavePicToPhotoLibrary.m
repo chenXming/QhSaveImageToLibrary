@@ -56,8 +56,8 @@
     self.downloadQueue.maxConcurrentOperationCount = self.maxConcurrentDownloadCount;
     
     NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
-
-        [self backgroundSaveImageAndDeleteOldFilesWithLibraryName:libryName callBack:completionHandler];
+        __strong __typeof (wself) sself = wself;
+        [sself backgroundSaveImageAndDeleteOldFilesWithLibraryName:libryName callBack:completionHandler];
     }];
 
     for (NSInteger i = 0; i < imageUrlList.count; i++) {
@@ -70,7 +70,6 @@
         }];
         [self.downloadQueue addOperation:task];
         [finalTask addDependency:task];
-        NSLog(@"task=====%@",task);
     }
     [self.downloadQueue addOperation:finalTask];
 }
@@ -99,7 +98,7 @@
     }];
     
     [self saveImageToPhotoLibraryWithImageList:cacheImageList andLibraryName:libryName callBack:^(BOOL success) {
-        NSLog(@"存储成功");
+        NSLog(@"所有图片存储成功");
         [cacheImageList removeAllObjects];
         [wself saveSuccessImageWithCompletionHandler:completionHandler];
         [application endBackgroundTask:bgTask];
