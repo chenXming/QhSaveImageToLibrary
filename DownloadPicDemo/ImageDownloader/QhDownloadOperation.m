@@ -12,11 +12,11 @@
 @property (assign, nonatomic, getter=isExecuting) BOOL executing;
 @property (assign, nonatomic, getter=isFinished) BOOL finished;
 
-@property (copy, nonatomic) NSString *imageUrlStr;
-@property (copy, nonatomic) NSURLSessionDownloadTask *downloadTask;
+@property (copy, nonatomic, nullable) NSString *imageUrlStr;
+@property (copy, nonatomic, nullable) NSURLSessionDownloadTask *downloadTask;
 @property (strong, nonatomic, nullable) NSURLSession *session;
 
-@property (copy, nonatomic) DownloadCompletionHandler completionHandler;
+@property (copy, nonatomic, nullable) DownloadCompletionHandler completionHandler;
 @property (assign, nonatomic) BOOL backgroundSupport;
 @property (assign, nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 

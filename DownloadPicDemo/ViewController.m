@@ -10,6 +10,8 @@
 #import "QhSavePicToPhotoLibrary.h"
 #import "QhUploadPicToServe.h"
 
+#define   ServeIp      @"https://sm.ms/api/v2/upload"
+
 @interface ViewController ()
 
 @property(strong, nonatomic, nonnull) QhSavePicToPhotoLibrary *savePic;
@@ -60,13 +62,12 @@
 //    [self.savePic cancelAllDownloads];
     
     NSString *imageBundle = [[NSBundle mainBundle] pathForResource:@"test001" ofType:@"png"];
-    NSLog(@"imageBundle===%@",imageBundle);
     NSArray *imageArr = @[imageBundle,imageBundle,imageBundle,imageBundle];
     QhUploadPicToServe *upload = [[QhUploadPicToServe alloc] init];
     upload.maxConcurrentUploadCount = 4;
     
-    [upload uploadImageWithMianUrl:@"https://sm.ms/api/v2/upload" andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success) {
-        
+    [upload uploadImageWithServeIp:ServeIp andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success) {
+        NSLog(@"success==%d",success);
     }];
     
 }

@@ -19,13 +19,13 @@
 @property (assign, nonatomic, getter=isExecuting) BOOL executing;
 @property (assign, nonatomic, getter=isFinished) BOOL finished;
 
-@property (copy, nonatomic) NSString *serveIp;
-@property (copy, nonatomic) NSString *imageLocalUrl;
-@property (copy, nonatomic) NSString *serveFileParameter;
-@property (copy, nonatomic) NSURLSessionUploadTask *uploadTask;
+@property (copy, nonatomic, nullable) NSString *serveIp;
+@property (copy, nonatomic, nullable) NSString *imageLocalUrl;
+@property (copy, nonatomic, nullable) NSString *serveFileParameter;
+@property (copy, nonatomic, nullable) NSURLSessionUploadTask *uploadTask;
 @property (strong, nonatomic, nullable) NSURLSession *session;
 
-@property (copy, nonatomic) UploadCompletionHandler completionHandler;
+@property (copy, nonatomic, nullable) UploadCompletionHandler completionHandler;
 @property (assign, nonatomic) BOOL backgroundSupport;
 @property (assign, nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
@@ -122,7 +122,7 @@
 /**
  * 拼接上传数据
  */
-- (NSData*)getUploadDataWithParameter:(NSString *)serveFileParameter{
+- (NSData *)getUploadDataWithParameter:(NSString *)serveFileParameter{
     
     NSMutableData *data = [NSMutableData data];
     [data appendData:Encode(@"--")];
@@ -160,17 +160,18 @@
 }
 
 - (void)done {
-    NSLog(@"---------------------->");
     
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
     if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
         return;
     }
+    
     if (self.backgroundTaskId != UIBackgroundTaskInvalid) {
         UIApplication * app = [UIApplication performSelector:@selector(sharedApplication)];
         [app endBackgroundTask:self.backgroundTaskId];
         self.backgroundTaskId = UIBackgroundTaskInvalid;
     }
+    
     self.finished = YES;
     self.executing = NO;
 }
