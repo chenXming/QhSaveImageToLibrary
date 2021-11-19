@@ -14,6 +14,7 @@
 @interface ViewController ()
 
 @property(strong, nonatomic, nonnull) QhSavePicToPhotoLibrary *savePic;
+@property(strong, nonatomic, nonnull) QhUploadPicToServe *upLoadPic;
 
 @end
 
@@ -62,11 +63,11 @@
     
     NSString *imageBundle = [[NSBundle mainBundle] pathForResource:@"test001" ofType:@"png"];
     NSArray *imageArr = @[imageBundle];
-    QhUploadPicToServe *upload = [[QhUploadPicToServe alloc] init];
-    upload.maxConcurrentUploadCount = 4;
+    self.upLoadPic = [[QhUploadPicToServe alloc] init];
+    self.upLoadPic.maxConcurrentUploadCount = 1;
     
-    [upload uploadImageWithServeIp:ServeIp andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success) {
-        NSLog(@"success==%d",success);
+    [self.upLoadPic uploadImageWithServeIp:ServeIp andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success,NSArray *imageUrlList) {
+        NSLog(@"success==%d\nimageUrlList==%@",success,imageUrlList);
     }];
     
 }

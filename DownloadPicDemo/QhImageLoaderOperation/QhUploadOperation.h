@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^UploadCompletionHandler)(BOOL success , NSError * __nullable error);
+typedef void(^UploadCompletionHandler)(BOOL success, NSString * __nullable imageUrl, NSError * __nullable error);
 
 @interface QhUploadOperation : NSOperation
 

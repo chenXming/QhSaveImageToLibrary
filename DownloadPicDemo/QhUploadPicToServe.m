@@ -11,6 +11,7 @@
 @interface QhUploadPicToServe()
 
 @property (strong, nonatomic, nonnull) NSOperationQueue  *uploadQueue;
+@property (strong, nonatomic, nonnull) NSMutableArray    *imageUrlList;//服务返回的图片url数组
 
 @end
 
@@ -21,6 +22,7 @@
     if (self) {
         self.maxConcurrentUploadCount = 5;
         self.backgroundUploadSupport = YES;
+        self.imageUrlList = [[NSMutableArray alloc] initWithCapacity:0];
     }
     return self;
 }
@@ -38,14 +40,17 @@
     NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
         NSLog(@"所有图片上传成功");
         __strong __typeof (wself) sself = wself;
-        [self allImageUploadComplate:completionHandler];
+        [sself allImageUploadComplate:completionHandler];
     }];
 
     for (NSInteger i = 0; i < imagePathList.count; i++) {
-        QhUploadOperation *task = [[QhUploadOperation alloc] initWithServeIp:serveIp andServeFileParameter:serveFileParameter andImageUrlStr:imagePathList[i] backgroundSupport:self.backgroundUploadSupport withCompletionHandler:^(BOOL success, NSError * _Nullable error) {
+        QhUploadOperation *task = [[QhUploadOperation alloc] initWithServeIp:serveIp andServeFileParameter:serveFileParameter andImageUrlStr:imagePathList[i] backgroundSupport:self.backgroundUploadSupport withCompletionHandler:^(BOOL success,NSString * _Nullable imageUrl, NSError * _Nullable error) {
+            __strong __typeof (wself) sself = wself;
 
-            if(success){
-                NSLog(@"上传成功");
+            if(success && imageUrl){
+                [sself.imageUrlList addObject:imageUrl];
+            } else {
+                [sself.imageUrlList addObject:error.localizedDescription];
             }
         }];
         [self.uploadQueue addOperation:task];
@@ -57,7 +62,7 @@
 - (void)allImageUploadComplate:(LoadCompletionHandler)completionHandler{
     
     if(completionHandler){
-        completionHandler(YES);
+        completionHandler(YES,self.imageUrlList);
     }
 }
 /**

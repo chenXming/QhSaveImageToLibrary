@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^LoadCompletionHandler)(BOOL success);
+typedef void(^LoadCompletionHandler)(BOOL success , NSArray *imageUrlList);
 
 @interface QhUploadPicToServe : NSObject
 

@@ -97,15 +97,25 @@
     self.uploadTask = [self.session uploadTaskWithRequest:request fromData:uploadData completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
         __strong __typeof (wself) sself = wself;
-
+        // 解析服务器返回的数据
         if(error == nil) {
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
             NSLog(@"jsonDict==%@",jsonDict);
+            NSString *imageUrl = @"";
+            if([jsonDict[data] isKindOfClass:[NSDictionary class]]){
+                NSDictionary *dataDict = jsonDict[data];
+                imageUrl = dataDict[@"url"];
+            } else {
+                imageUrl = jsonDict[@"images"];
+            }
+            
             if(sself.completionHandler){
-                sself.completionHandler(YES, nil);
+                sself.completionHandler(YES,imageUrl,nil);
             }
         } else {
-            sself.completionHandler(NO, error);
+            if(sself.completionHandler){
+                sself.completionHandler(NO,nil,error);
+            }
         }
         
         [sself done];
@@ -116,7 +126,7 @@
     if(self.uploadTask) {
         [self.uploadTask resume];
     } else {
-        self.completionHandler(NO, [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:@{NSLocalizedDescriptionKey : @"Task can't be initialized"}]);
+        self.completionHandler(NO,nil, [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:@{NSLocalizedDescriptionKey : @"Task can't be initialized"}]);
         [self done];
         return;
     }
