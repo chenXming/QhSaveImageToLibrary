@@ -119,6 +119,7 @@
                    break;
               case PHAuthorizationStatusDenied:
                    NSLog(@"访问相册权限受限");
+                    [self saveFailImageWithCompletionHandler:completionHandler];
                    break;
               case PHAuthorizationStatusAuthorized:
                    [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
@@ -136,12 +137,14 @@
                     [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
                 } else {
                     NSLog(@"访问相册权限受限");
+                    [self saveFailImageWithCompletionHandler:completionHandler];
                 }
             }];
         } else if (authorStatus == PHAuthorizationStatusAuthorized) {
             [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
         } else {
             NSLog(@"访问相册权限受限");
+            [self saveFailImageWithCompletionHandler:completionHandler];
         }
     }
 }
@@ -180,7 +183,6 @@
             NSLog(@"保存成功");
             [imageList removeObjectAtIndex:0];
         }
-        
         [self saveImageListToLibrary:imageList andLibraryNmae:libryName andSaveCallBack:completionHandler];
     }];
 }
@@ -196,6 +198,16 @@
         
     if(completionHandler){
         completionHandler(YES);
+    }
+}
+
+/**
+ * 保存失败后的回调
+ */
+- (void)saveFailImageWithCompletionHandler:(SaveCompletionHandler)completionHandler {
+    
+    if(completionHandler){
+        completionHandler(NO);
     }
 }
 

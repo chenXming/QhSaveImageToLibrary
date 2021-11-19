@@ -16,29 +16,35 @@
 @property(strong, nonatomic, nonnull) QhSavePicToPhotoLibrary *savePic;
 @property(strong, nonatomic, nonnull) QhUploadPicToServe *upLoadPic;
 
+@property (weak, nonatomic) IBOutlet UITextField *customLibraryField;
+@property (weak, nonatomic) IBOutlet UITextField *setMaxCocurrentCountField;
+@property (weak, nonatomic) IBOutlet UISwitch *backgroundTaskSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *whetherDeleateCacheSwitch;
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.savePic = [[QhSavePicToPhotoLibrary alloc] init];
+    self.upLoadPic = [[QhUploadPicToServe alloc] init];
+
     NSLog(@"%s",__func__);
 }
-- (IBAction)clickDown:(id)sender {
+
+- (IBAction)saveLocalImageToCustomLibraryClick:(id)sender {
     
-    NSLog(@"=========");
-    [self.upLoadPic cancelAllUpload];
-    return;
-    /*
     NSArray *imageList = @[[UIImage imageNamed:@"001.jpg"],[UIImage imageNamed:@"002.jpg"],[UIImage imageNamed:@"003.jpg"],[UIImage imageNamed:@"00003.jpg"],[UIImage imageNamed:@"0004.jpg"],[UIImage imageNamed:@"0005.jpg"],
                            [UIImage imageNamed:@"00006.jpg"]];
-    QhSavePicToPhotoLibrary *savePic = [[QhSavePicToPhotoLibrary alloc] init];
-    [savePic saveImageToPhotoLibraryWithImageList:imageList andLibraryNmae:@"测试" callBack:^(BOOL success) {
-        NSLog(@"success===%d",success);
+    [self.savePic saveImageToPhotoLibraryWithImageList:imageList andLibraryName:@"" callBack:^(BOOL success) {
+        
     }];
-    */
-    
+}
+
+- (IBAction)downloadImageToLibraryClick:(id)sender {
+
+    __weak __typeof (self) wself = self;
     NSArray *imageUrlList = @[[NSURL URLWithString:@"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg"],
                               [NSURL URLWithString:@"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg"],
                               [NSURL URLWithString:@"https://i.loli.net/2021/11/02/pdF3jiDGTxLUPhl.jpg"],
@@ -51,26 +57,38 @@
                               [NSURL URLWithString:@"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg"]];
     
     self.savePic = [[QhSavePicToPhotoLibrary alloc] init];
-    self.savePic.maxConcurrentDownloadCount = 1;
+    self.savePic.maxConcurrentDownloadCount = 3;
     [self.savePic saveOnLineImageToPhotoLibraryWithImageList:imageUrlList andLibraryName:@"测试2" callBack:^(BOOL success) {
+        __strong __typeof (wself) sself = wself;
         NSLog(@"success=========>>>>%d",success);
+        if(success){
+            
+        }else {
+            [sself showAlert];
+        }
     }];
 }
 
-- (IBAction)cancelDownImage:(id)sender {
-    
-    NSLog(@"%s",__func__);
-//   [self.savePic cancelAllDownloads];
+- (IBAction)upLoadImageListToServerClick:(id)sender {
     
     NSString *imageBundle = [[NSBundle mainBundle] pathForResource:@"test001" ofType:@"png"];
     NSArray *imageArr = @[imageBundle,imageBundle];
-    self.upLoadPic = [[QhUploadPicToServe alloc] init];
     self.upLoadPic.maxConcurrentUploadCount = 1;
 
     [self.upLoadPic uploadImageWithServeIp:ServeIp andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success,NSArray *imageUrlList) {
         NSLog(@"success==%d\nimageUrlList==%@",success,imageUrlList);
     }];
-    
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [self.view endEditing:YES];
+}
+
+- (void)showAlert {
+    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"提示" message:@"请在设备的\"设置-隐私-照片\"中允许访问相册" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *sureAction = [UIAlertAction actionWithTitle:@"确认" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    }];
+    [alertController addAction:sureAction];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
 @end
