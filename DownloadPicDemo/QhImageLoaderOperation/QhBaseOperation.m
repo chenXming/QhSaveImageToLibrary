@@ -7,17 +7,6 @@
 
 #import "QhBaseOperation.h"
 
-@interface QhBaseOperation()
-@property (assign, nonatomic, getter=isExecuting) BOOL executing;
-@property (assign, nonatomic, getter=isFinished) BOOL finished;
-
-@property (strong, nonatomic, nullable) NSURLSession *session;
-
-@property (assign, nonatomic) BOOL backgroundSupport;
-@property (assign, nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
-
-@end
-
 @implementation QhBaseOperation
 @synthesize executing = _executing;
 @synthesize finished = _finished;
@@ -26,6 +15,7 @@
 {
     self = [super init];
     if (self) {
+        self.backgroundSupport = YES;
         [self initSession];
     }
     return self;
@@ -51,6 +41,7 @@
     
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
     BOOL hasApplication = UIApplicationClass && [UIApplicationClass respondsToSelector:@selector(sharedApplication)];
+    
     if (hasApplication && self.backgroundSupport) {
         __weak __typeof__ (self) wself = self;
         UIApplication * app = [UIApplicationClass performSelector:@selector(sharedApplication)];
@@ -64,7 +55,7 @@
             }
         }];
     }
-  
+    
     [self startTask];
 }
 
@@ -105,15 +96,16 @@
 - (void)cancel {
     
     @synchronized (self) {
-        [self cancelDownLoad];
+        [self cancelLoad];
     }
 }
 
-- (void)cancelDownLoad {
+- (void)cancelLoad {
         
     if (self.isFinished) return;
     [super cancel];
     [self cancelTask];
+    
     if (self.session) {
         [self.session invalidateAndCancel];
         self.session = nil;
@@ -140,6 +132,7 @@
 - (void)cancelTask{
     
 }
+
 - (void)dealloc{
     NSLog(@"任务释放了:::");
 }

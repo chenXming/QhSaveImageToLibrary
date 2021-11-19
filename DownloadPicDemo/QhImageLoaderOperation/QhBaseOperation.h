@@ -12,6 +12,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface QhBaseOperation : NSOperation
 
+@property (assign, nonatomic, getter=isExecuting) BOOL executing;
+@property (assign, nonatomic, getter=isFinished) BOOL finished;
+
+@property (assign, nonatomic) BOOL backgroundSupport;
+@property (strong, nonatomic, nullable) NSURLSession *session;
+@property (assign, nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
+
+- (void)startTask;
+- (void)cancelTask;
+- (void)done;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -28,7 +28,8 @@
 - (IBAction)clickDown:(id)sender {
     
     NSLog(@"=========");
-    
+    [self.upLoadPic cancelAllUpload];
+    return;
     /*
     NSArray *imageList = @[[UIImage imageNamed:@"001.jpg"],[UIImage imageNamed:@"002.jpg"],[UIImage imageNamed:@"003.jpg"],[UIImage imageNamed:@"00003.jpg"],[UIImage imageNamed:@"0004.jpg"],[UIImage imageNamed:@"0005.jpg"],
                            [UIImage imageNamed:@"00006.jpg"]];
@@ -59,13 +60,13 @@
 - (IBAction)cancelDownImage:(id)sender {
     
     NSLog(@"%s",__func__);
-//    [self.savePic cancelAllDownloads];
+//   [self.savePic cancelAllDownloads];
     
     NSString *imageBundle = [[NSBundle mainBundle] pathForResource:@"test001" ofType:@"png"];
-    NSArray *imageArr = @[imageBundle];
+    NSArray *imageArr = @[imageBundle,imageBundle];
     self.upLoadPic = [[QhUploadPicToServe alloc] init];
     self.upLoadPic.maxConcurrentUploadCount = 1;
-    
+
     [self.upLoadPic uploadImageWithServeIp:ServeIp andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success,NSArray *imageUrlList) {
         NSLog(@"success==%d\nimageUrlList==%@",success,imageUrlList);
     }];

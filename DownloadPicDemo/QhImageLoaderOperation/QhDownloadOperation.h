@@ -6,13 +6,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import "QhBaseOperation.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^DownloadCompletionHandler)(BOOL success , NSString * __nullable filePath, NSError * __nullable error);
 
-@interface QhDownloadOperation : NSOperation
+@interface QhDownloadOperation : QhBaseOperation
 
 /**
  * @brief 初始化下载任务

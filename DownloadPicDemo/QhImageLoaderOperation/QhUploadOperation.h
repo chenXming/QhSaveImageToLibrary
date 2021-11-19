@@ -6,13 +6,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import "QhBaseOperation.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^UploadCompletionHandler)(BOOL success, NSString * __nullable imageUrl, NSError * __nullable error);
 
-@interface QhUploadOperation : NSOperation
+@interface QhUploadOperation : QhBaseOperation
 
 /**
  * @brief 初始化上传任务
