@@ -1,44 +1,46 @@
 //
-//  DownloadOperation.m
+//  QhBaseOperation.m
 //  DownloadPicDemo
 //
-//  Created by 陈小明 on 2021/10/21.
+//  Created by 陈小明 on 2021/11/19.
 //
 
-#import "QhDownloadOperation.h"
+#import "QhBaseOperation.h"
 
-@interface QhDownloadOperation()
-
+@interface QhBaseOperation()
 @property (assign, nonatomic, getter=isExecuting) BOOL executing;
 @property (assign, nonatomic, getter=isFinished) BOOL finished;
 
-@property (copy, nonatomic, nullable) NSString *imageUrlStr;
-@property (copy, nonatomic, nullable) NSURLSessionDownloadTask *downloadTask;
 @property (strong, nonatomic, nullable) NSURLSession *session;
 
-@property (copy, nonatomic, nullable) DownloadCompletionHandler completionHandler;
 @property (assign, nonatomic) BOOL backgroundSupport;
 @property (assign, nonatomic) UIBackgroundTaskIdentifier backgroundTaskId;
 
 @end
 
-@implementation QhDownloadOperation
-
+@implementation QhBaseOperation
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 
-- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(DownloadCompletionHandler)completionHandler{
-
-    if(self = [super init]){
-        _backgroundSupport = background;
-        _imageUrlStr = imageUrlStr;
-        if(completionHandler){
-            _completionHandler = completionHandler;
-        }
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self initSession];
     }
-    return  self;
+    return self;
 }
 
+- (void)initSession {
+    
+    if(!self.session){
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        configuration.timeoutIntervalForRequest = 15;
+        configuration.allowsCellularAccess = YES;
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+        self.session = session;
+    }
+}
 - (void)start{
     
     if (self.isCancelled){
@@ -62,42 +64,12 @@
             }
         }];
     }
-    __weak typeof(self) weakSelf = self;
+  
+    [self startTask];
+}
 
-    NSURL *url = [NSURL URLWithString:self.imageUrlStr];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+- (void)startTask {
     
-    if(!self.session){
-        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        configuration.timeoutIntervalForRequest = 15;
-        configuration.allowsCellularAccess = YES;
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
-        self.session = session;
-    }
-    
-    self.downloadTask = [self.session downloadTaskWithRequest:request completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-        if(error == nil){
-            NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)  lastObject];
-            NSString *filePath = [cache stringByAppendingPathComponent:response.suggestedFilename];
-            NSLog(@"filePath = %@",filePath);
-            NSURL *toURL = [NSURL fileURLWithPath:filePath];
-            [[NSFileManager defaultManager] moveItemAtURL:location toURL:toURL error:nil];
-            weakSelf.completionHandler(YES, filePath, nil);
-        } else {
-            weakSelf.completionHandler(NO, nil, error);
-        }
-        [weakSelf done];
-    }];
-    self.executing = YES;
-
-    if(self.downloadTask) {
-        [self.downloadTask resume];
-    } else {
-        self.completionHandler(NO, nil, [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:@{NSLocalizedDescriptionKey : @"Task can't be initialized"}]);
-        [self done];
-        return;
-    }
 }
 
 - (void)setExecuting:(BOOL )executing{
@@ -141,13 +113,7 @@
         
     if (self.isFinished) return;
     [super cancel];
-
-    if (self.downloadTask) {
-        [self.downloadTask cancel];
-        self.downloadTask = nil;
-        [self done];
-    }
-    
+    [self cancelTask];
     if (self.session) {
         [self.session invalidateAndCancel];
         self.session = nil;
@@ -171,8 +137,11 @@
     return YES;
 }
 
-- (void)dealloc{
+- (void)cancelTask{
     
-    NSLog(@"imageUrlStr:释放了:%@",self.imageUrlStr);
 }
+- (void)dealloc{
+    NSLog(@"任务释放了:::");
+}
+
 @end

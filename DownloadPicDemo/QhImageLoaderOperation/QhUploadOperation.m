@@ -8,11 +8,8 @@
 #import "QhUploadOperation.h"
 #import "UIImage+ImageContent.h"
 
-//分隔符
 #define Boundary @"QhUploadImage"
-//换行
 #define Enter [@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]
-//NSString转NSData
 #define Encode(string) [string dataUsingEncoding:NSUTF8StringEncoding]
 
 @interface QhUploadOperation()
@@ -57,7 +54,6 @@
     if (self.isCancelled) {
         self.executing = NO;
         self.finished = YES;
-        self.uploadTask = nil;
         return;
     }
 

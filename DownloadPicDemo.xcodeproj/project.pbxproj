@@ -22,6 +22,7 @@
 		5F2FB2922744FFAA00FAC126 /* test001.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F2FB2912744FFAA00FAC126 /* test001.png */; };
 		5F2FB2952745242C00FAC126 /* QhUploadPicToServe.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F2FB2942745242C00FAC126 /* QhUploadPicToServe.m */; };
 		5F2FB29B27465DED00FAC126 /* UIImage+ImageContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F2FB29A27465DED00FAC126 /* UIImage+ImageContent.m */; };
+		5F2FB29E274747DA00FAC126 /* QhBaseOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F2FB29D274747DA00FAC126 /* QhBaseOperation.m */; };
 		5F83AF1B273E55BB00CD2758 /* NextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5F83AF19273E55BB00CD2758 /* NextViewController.m */; };
 		5F83AF1C273E55BB00CD2758 /* NextViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5F83AF1A273E55BB00CD2758 /* NextViewController.xib */; };
 		5FFBCC202721612B0080F7AE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FFBCC1F2721612B0080F7AE /* AppDelegate.m */; };
@@ -71,6 +72,8 @@
 		5F2FB2942745242C00FAC126 /* QhUploadPicToServe.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QhUploadPicToServe.m; sourceTree = "<group>"; };
 		5F2FB29927465DED00FAC126 /* UIImage+ImageContent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageContent.h"; sourceTree = "<group>"; };
 		5F2FB29A27465DED00FAC126 /* UIImage+ImageContent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageContent.m"; sourceTree = "<group>"; };
+		5F2FB29C274747DA00FAC126 /* QhBaseOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QhBaseOperation.h; sourceTree = "<group>"; };
+		5F2FB29D274747DA00FAC126 /* QhBaseOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = QhBaseOperation.m; sourceTree = "<group>"; };
 		5F83AF18273E55BB00CD2758 /* NextViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NextViewController.h; sourceTree = "<group>"; };
 		5F83AF19273E55BB00CD2758 /* NextViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NextViewController.m; sourceTree = "<group>"; };
 		5F83AF1A273E55BB00CD2758 /* NextViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NextViewController.xib; sourceTree = "<group>"; };
@@ -225,6 +228,8 @@
 		5FFBCC63272162010080F7AE /* QhImageLoaderOperation */ = {
 			isa = PBXGroup;
 			children = (
+				5F2FB29C274747DA00FAC126 /* QhBaseOperation.h */,
+				5F2FB29D274747DA00FAC126 /* QhBaseOperation.m */,
 				5FFBCC67272168160080F7AE /* QhDownloadOperation.h */,
 				5FFBCC68272168160080F7AE /* QhDownloadOperation.m */,
 				5F2FB28E2744EE7F00FAC126 /* QhUploadOperation.h */,
@@ -424,6 +429,7 @@
 				5F2FB2902744EE7F00FAC126 /* QhUploadOperation.m in Sources */,
 				5F83AF1B273E55BB00CD2758 /* NextViewController.m in Sources */,
 				5FFBCC202721612B0080F7AE /* AppDelegate.m in Sources */,
+				5F2FB29E274747DA00FAC126 /* QhBaseOperation.m in Sources */,
 				5FFBCC312721612D0080F7AE /* main.m in Sources */,
 				5F279A9127265A22000BC96A /* QhSavePicToPhotoLibrary.m in Sources */,
 				5FFBCC69272168160080F7AE /* QhDownloadOperation.m in Sources */,
