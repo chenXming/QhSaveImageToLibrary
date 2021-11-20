@@ -69,6 +69,9 @@
                         <constraint firstAttribute="height" constant="31" id="BU2-nc-bux"/>
                         <constraint firstAttribute="width" constant="47" id="rUa-ya-Er3"/>
                     </constraints>
+                    <connections>
+                        <action selector="backgroundSwitchAction:" destination="-1" eventType="valueChanged" id="VIH-tU-825"/>
+                    </connections>
                 </switch>
                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="biG-0v-Qv4">
                     <rect key="frame" x="347" y="247" width="49" height="31"/>
@@ -76,6 +79,9 @@
                         <constraint firstAttribute="width" constant="47" id="PWj-vW-1kr"/>
                         <constraint firstAttribute="height" constant="31" id="scf-oJ-tav"/>
                     </constraints>
+                    <connections>
+                        <action selector="whetherDeleteCacheSwicthAction:" destination="-1" eventType="valueChanged" id="EYk-53-9kb"/>
+                    </connections>
                 </switch>
                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="JzH-EG-xOV">
                     <rect key="frame" x="309" y="109" width="90" height="34"/>

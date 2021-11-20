@@ -58,8 +58,8 @@
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
             NSLog(@"jsonDict==%@",jsonDict);
             NSString *imageUrl = @"";
-            if([jsonDict[data] isKindOfClass:[NSDictionary class]]){
-                NSDictionary *dataDict = jsonDict[data];
+            if([jsonDict[@"data"] isKindOfClass:[NSDictionary class]]){
+                NSDictionary *dataDict = jsonDict[@"data"];
                 imageUrl = dataDict[@"url"];
             } else {
                 imageUrl = jsonDict[@"images"];

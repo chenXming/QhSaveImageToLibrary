@@ -108,6 +108,8 @@
 
 - (void)saveImageToPhotoWithRequestAuthorizationWithImageList:(NSArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler{
         
+    __weak QhSavePicToPhotoLibrary *weakSelf = self;
+    
     if (@available(iOS 14, *)) {
         PHAccessLevel level = PHAccessLevelReadWrite;
         [PHPhotoLibrary requestAuthorizationForAccessLevel:level handler:^(PHAuthorizationStatus status) {
@@ -115,14 +117,14 @@
             switch (status) {
               case PHAuthorizationStatusLimited:
                    NSLog(@"受限的访问权限创建自定义相册会失败");
-                   [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
+                   [weakSelf saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
                    break;
               case PHAuthorizationStatusDenied:
                    NSLog(@"访问相册权限受限");
-                    [self saveFailImageWithCompletionHandler:completionHandler];
+                    [weakSelf saveFailImageWithCompletionHandler:completionHandler];
                    break;
               case PHAuthorizationStatusAuthorized:
-                   [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
+                   [weakSelf saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
                    break;
               default:
                   break;
@@ -134,10 +136,10 @@
             [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
                 
                 if (status == PHAuthorizationStatusAuthorized) {
-                    [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
+                    [weakSelf saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
                 } else {
                     NSLog(@"访问相册权限受限");
-                    [self saveFailImageWithCompletionHandler:completionHandler];
+                    [weakSelf saveFailImageWithCompletionHandler:completionHandler];
                 }
             }];
         } else if (authorStatus == PHAuthorizationStatusAuthorized) {
@@ -151,6 +153,8 @@
 
 - (void)saveImageListToLibrary:(NSMutableArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName andSaveCallBack:(SaveCompletionHandler)completionHandler{
     
+    __weak QhSavePicToPhotoLibrary *weakSelf = self;
+
     if([imageList count] == 0){
         
         if (completionHandler) {
@@ -169,7 +173,7 @@
 
         PHAssetCollectionChangeRequest *assetCollectionChangeRequest;
         
-        if (self.createCollection) {
+        if (weakSelf.createCollection) {
             assetCollectionChangeRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:self.createCollection];
             PHAssetChangeRequest *assetChangeRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:imagePhoto];
             PHObjectPlaceholder *placeholder = [assetChangeRequest placeholderForCreatedAsset];
@@ -183,7 +187,7 @@
             NSLog(@"保存成功");
             [imageList removeObjectAtIndex:0];
         }
-        [self saveImageListToLibrary:imageList andLibraryNmae:libryName andSaveCallBack:completionHandler];
+        [weakSelf saveImageListToLibrary:imageList andLibraryNmae:libryName andSaveCallBack:completionHandler];
     }];
 }
 
