@@ -1,13 +1,13 @@
 //
-//  QhBaseOperation.m
+//  QHBaseOperation.m
 //  DownloadPicDemo
 //
-//  Created by 陈小明 on 2021/11/19.
+//  Created by 陈小明 on 2021/11/20.
 //
 
-#import "QhBaseOperation.h"
+#import "QHBaseOperation.h"
 
-@implementation QhBaseOperation
+@implementation QHBaseOperation
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 

@@ -1,28 +1,41 @@
 //
-//  QhUploadPicToServe.m
+//  QHUploadPicToServeManager.m
 //  DownloadPicDemo
 //
 //  Created by 陈小明 on 2021/11/17.
 //
 
-#import "QhUploadPicToServe.h"
-#import "QhImageLoaderOperation/QhUploadOperation.h"
+#import "QHUploadPicToServeManager.h"
+#import "QHUploadOperation.h"
 
-@interface QhUploadPicToServe()
+@interface QHUploadPicToServeManager()
 
 @property (strong, nonatomic, nonnull) NSOperationQueue  *uploadQueue;
 @property (strong, nonatomic, nonnull) NSMutableArray    *imageUrlList;//服务返回的图片url数组
 
 @end
 
-@implementation QhUploadPicToServe
+@implementation QHUploadPicToServeManager
+
+/**
+ * @brief 获取单例
+ */
++ (nonnull instancetype)sharedInstance {
+    static dispatch_once_t once;
+    static id instance;
+    dispatch_once(&once, ^{
+        instance = [[self alloc] init];
+    });
+    return instance;
+}
 
 - (instancetype)init {
     self = [super init];
    
     if (self) {
-        self.maxConcurrentUploadCount = 5;
+        self.maxConcurrentUploadCount = 3;
         self.backgroundUploadSupport = YES;
+        self.uploadQueue = [[NSOperationQueue alloc] init];
         self.imageUrlList = [[NSMutableArray alloc] initWithCapacity:0];
     }
     return self;
@@ -31,11 +44,11 @@
 /**
  * @brief 上传图片到服务端
  */
-- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(QhLoadCompletionHandler)completionHandler {
-    __weak QhUploadPicToServe *wself = self;
+- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(QHLoadCompletionHandler)completionHandler {
+    __weak __typeof__ (self) wself = self;
 
-    self.uploadQueue = [[NSOperationQueue alloc] init];
     self.uploadQueue.maxConcurrentOperationCount = self.maxConcurrentUploadCount;
+    [self.imageUrlList removeAllObjects];
     
     NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
         NSLog(@"所有图片上传成功");
@@ -44,13 +57,13 @@
     }];
 
     for (NSInteger i = 0; i < imagePathList.count; i++) {
-        QhUploadOperation *task = [[QhUploadOperation alloc] initWithServeIp:serveIp andServeFileParameter:serveFileParameter andImageUrlStr:imagePathList[i] backgroundSupport:self.backgroundUploadSupport withCompletionHandler:^(BOOL success,NSString * _Nullable imageUrl, NSError * _Nullable error) {
+        QHUploadOperation *task = [[QHUploadOperation alloc] initWithServeIp:serveIp andServeFileParameter:serveFileParameter andImageUrlStr:imagePathList[i] backgroundSupport:self.backgroundUploadSupport withCompletionHandler:^(BOOL success,NSString * _Nullable imageUrl, NSError * _Nullable error) {
             __strong __typeof (wself) sself = wself;
 
             if (success && imageUrl) {
                 [sself.imageUrlList addObject:imageUrl];
             } else {
-                [sself.imageUrlList addObject:error.localizedDescription];
+                [sself.imageUrlList addObject:[NSString stringWithFormat:@"%@",error.localizedDescription]];
             }
         }];
         [self.uploadQueue addOperation:task];
@@ -59,7 +72,7 @@
     [self.uploadQueue addOperation:finalTask];
 }
 
-- (void)allImageUploadComplate:(QhLoadCompletionHandler)completionHandler{
+- (void)allImageUploadComplate:(QHLoadCompletionHandler)completionHandler{
     dispatch_async(dispatch_get_main_queue(), ^{
        
         if (completionHandler) {

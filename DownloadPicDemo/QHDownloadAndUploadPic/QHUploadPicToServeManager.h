@@ -1,5 +1,5 @@
 //
-//  QhUploadPicToServe.h
+//  QHUploadPicToServeManager.h
 //  DownloadPicDemo
 //
 //  Created by 陈小明 on 2021/11/17.
@@ -9,13 +9,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^QhLoadCompletionHandler)(BOOL success , NSArray *imageUrlList);
+typedef void(^QHLoadCompletionHandler)(BOOL success , NSArray *imageUrlList);
 
-@interface QhUploadPicToServe : NSObject
+@interface QHUploadPicToServeManager : NSObject
 
 /**
  * 网络图片最大同时上传数量
- * default = 5
+ * default = 3
  */
 @property (nonatomic, assign) NSInteger maxConcurrentUploadCount;
 
@@ -26,13 +26,18 @@ typedef void(^QhLoadCompletionHandler)(BOOL success , NSArray *imageUrlList);
 @property (nonatomic, assign) BOOL backgroundUploadSupport;
 
 /**
+ * @brief 获取单例
+ */
++ (nonnull instancetype)sharedInstance;
+
+/**
  * @brief 上传图片到服务端
  * @param serveIp 上传服务地址
  * @param serveFileParameter 服务端文件参数字段
  * @param imagePathList 图片路径list
  * @param completionHandler 完成后回调
  */
-- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(QhLoadCompletionHandler)completionHandler;
+- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(QHLoadCompletionHandler)completionHandler;
 
 /**
  * 取消所有上传任务

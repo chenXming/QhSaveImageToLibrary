@@ -1,30 +1,30 @@
 //
-//  QhUploadOperation.m
+//  QHUploadOperation.m
 //  DownloadPicDemo
 //
 //  Created by 陈小明 on 2021/11/17.
 //
 
-#import "QhUploadOperation.h"
+#import "QHUploadOperation.h"
 #import "UIImage+ImageContent.h"
 
-#define Boundary @"QhUploadImage"
+#define Boundary @"QHUploadImage"
 #define Enter [@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]
 #define Encode(string) [string dataUsingEncoding:NSUTF8StringEncoding]
 
-@interface QhUploadOperation()
+@interface QHUploadOperation()
 
 @property (copy, nonatomic, nullable) NSString *serveIp;
 @property (copy, nonatomic, nullable) NSString *imageLocalUrl;
 @property (copy, nonatomic, nullable) NSString *serveFileParameter;
 @property (copy, nonatomic, nullable) NSURLSessionUploadTask *uploadTask;
-@property (copy, nonatomic, nullable) QhUploadCompletionHandler completionHandler;
+@property (copy, nonatomic, nullable) QHUploadCompletionHandler completionHandler;
 
 @end
 
-@implementation QhUploadOperation
+@implementation QHUploadOperation
 
-- (instancetype)initWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImageUrlStr:(NSString *)imageLocalUrl backgroundSupport:(BOOL)background withCompletionHandler:(QhUploadCompletionHandler)completionHandler {
+- (instancetype)initWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImageUrlStr:(NSString *)imageLocalUrl backgroundSupport:(BOOL)background withCompletionHandler:(QHUploadCompletionHandler)completionHandler {
     
     if(self = [super init]){
         self.serveIp = serveIp;
@@ -52,11 +52,12 @@
     self.uploadTask = [self.session uploadTaskWithRequest:request fromData:uploadData completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
         __strong __typeof (wself) sself = wself;
+        NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
         // 解析服务器返回的数据
-        if (error == nil) {
-            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
+        if (error == nil && jsonDict != nil) {
             NSLog(@"jsonDict==%@",jsonDict);
             NSString *imageUrl = @"";
+           
             if ([jsonDict[@"data"] isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *dataDict = jsonDict[@"data"];
                 imageUrl = dataDict[@"url"];

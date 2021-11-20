@@ -1,16 +1,16 @@
 //
-//  QhSavePicToPhotoLibrary.m
+//  QHSavePicToPhotoLibraryManager.m
 //  DownloadPicDemo
 //
 //  Created by 陈小明 on 2021/10/25.
 //
 
-#import "QhSavePicToPhotoLibrary.h"
-#import "QhImageLoaderOperation/QhDownloadOperation.h"
+#import "QHSavePicToPhotoLibraryManager.h"
+#import "QHDownloadOperation.h"
 #import <Photos/Photos.h>
 
 
-@interface QhSavePicToPhotoLibrary ()
+@interface QHSavePicToPhotoLibraryManager ()
 //自定义相册
 @property (strong, nonatomic, nonnull) PHAssetCollection *createCollection;
 @property (strong, nonatomic, nonnull) NSMutableArray    *imagePathList;
@@ -18,7 +18,19 @@
 
 @end
 
-@implementation QhSavePicToPhotoLibrary
+@implementation QHSavePicToPhotoLibraryManager
+
+/**
+ * @brief 获取单例
+ */
++ (nonnull instancetype)sharedInstance {
+    static dispatch_once_t once;
+    static id instance;
+    dispatch_once(&once, ^{
+        instance = [[self alloc] init];
+    });
+    return instance;
+}
 
 - (instancetype)init {
     self = [super init];
@@ -27,6 +39,7 @@
         self.maxConcurrentDownloadCount = 5;
         self.deleteDownloadImageCache = YES;
         self.backgroundDownloadSupport = YES;
+        self.downloadQueue = [[NSOperationQueue alloc] init];
         self.imagePathList = [[NSMutableArray alloc] initWithCapacity:0];
     }
     return self;
@@ -38,9 +51,9 @@
  * @param libryName 相册名称，默认为应用名
  * @param completionHandler 保存后回调
  */
-- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler {
+- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(QHSaveCompletionHandler)completionHandler {
 
-    return [self saveImageToPhotoWithRequestAuthorizationWithImageList:imageList andLibraryNmae:libryName callBack:(QhSaveCompletionHandler)completionHandler];
+    return [self saveImageToPhotoWithRequestAuthorizationWithImageList:imageList andLibraryNmae:libryName whetherOnLine:NO callBack:completionHandler];
 }
 
 /**
@@ -49,36 +62,16 @@
  * @param libryName 相册名称，默认为应用名
  * @param completionHandler 保存后回调
  */
-- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSURL *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler {
-    __weak QhSavePicToPhotoLibrary *wself = self;
-
-    self.downloadQueue = [[NSOperationQueue alloc] init];
-    self.downloadQueue.maxConcurrentOperationCount = self.maxConcurrentDownloadCount;
-    
-    NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
-        __strong __typeof (wself) sself = wself;
-        [sself backgroundSaveImageAndDeleteOldFilesWithLibraryName:libryName callBack:completionHandler];
-    }];
-
-    for (NSInteger i = 0; i < imageUrlList.count; i++) {
-        QhDownloadOperation *task = [[QhDownloadOperation alloc] initWithImageUrlStr:[NSString stringWithFormat:@"%@",imageUrlList[i]] backgroundSupport:self.backgroundDownloadSupport withCompletionHandler:^(BOOL success, NSString * _Nullable filePath, NSError * _Nullable error) {
-            __strong __typeof (wself) sself = wself;
-            
-            if(success && filePath != nil){
-                [sself.imagePathList addObject:filePath];
-            }
-        }];
-        [self.downloadQueue addOperation:task];
-        [finalTask addDependency:task];
-    }
-    [self.downloadQueue addOperation:finalTask];
+- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSString *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(QHSaveCompletionHandler)completionHandler {
+   
+    return [self saveImageToPhotoWithRequestAuthorizationWithImageList:imageUrlList andLibraryNmae:libryName whetherOnLine:YES callBack:completionHandler];
 }
 
 /**
  * 后台保存任务
  */
-- (void)backgroundSaveImageAndDeleteOldFilesWithLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler {
-    __weak QhSavePicToPhotoLibrary *wself = self;
+- (void)backgroundSaveImageAndDeleteOldFilesWithLibraryName:(NSString *)libryName callBack:(QHSaveCompletionHandler)completionHandler {
+    __weak __typeof__ (self) wself = self;
 
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
     if (!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
@@ -105,55 +98,70 @@
     }];
 }
 
-- (void)saveImageToPhotoWithRequestAuthorizationWithImageList:(NSArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler{
-    __weak QhSavePicToPhotoLibrary *weakSelf = self;
-    
+#pragma mark - authorization
+
+- (void)saveImageToPhotoWithRequestAuthorizationWithImageList:(NSArray *)imageList andLibraryNmae:(NSString *)libryName whetherOnLine:(BOOL)onLine callBack:(QHSaveCompletionHandler)completionHandler{
+    __weak __typeof__ (self) wself = self;
+
     if (@available(iOS 14, *)) {
         PHAccessLevel level = PHAccessLevelReadWrite;
         [PHPhotoLibrary requestAuthorizationForAccessLevel:level handler:^(PHAuthorizationStatus status) {
-          
             switch (status) {
               case PHAuthorizationStatusLimited:
-                   NSLog(@"受限的访问权限创建自定义相册会失败");
-                   [weakSelf saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
-                   break;
+                    NSLog(@"受限的访问权限创建自定义相册会失败");
+                    [wself executeMethodWithImageList:imageList andLibraryNmae:libryName whetherOnLine:onLine callBack:completionHandler];
+                    break;
               case PHAuthorizationStatusDenied:
-                   NSLog(@"访问相册权限受限");
-                    [weakSelf saveFailImageWithCompletionHandler:completionHandler];
-                   break;
+                    NSLog(@"访问相册权限受限");
+                    [wself saveFailImageWithCompletionHandler:completionHandler];
+                    break;
               case PHAuthorizationStatusAuthorized:
-                   [weakSelf saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
-                   break;
+                    [wself executeMethodWithImageList:imageList andLibraryNmae:libryName whetherOnLine:onLine callBack:completionHandler];
+                    break;
               default:
                   break;
           }
         }];
     } else {
         PHAuthorizationStatus authorStatus = [PHPhotoLibrary authorizationStatus];
-        if (authorStatus == PHAuthorizationStatusNotDetermined) {
-            [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-                
-                if (status == PHAuthorizationStatusAuthorized) {
-                    [weakSelf saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
-                } else {
-                    NSLog(@"访问相册权限受限");
-                    [weakSelf saveFailImageWithCompletionHandler:completionHandler];
-                }
-            }];
-        } else if (authorStatus == PHAuthorizationStatusAuthorized) {
-            [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
-        } else {
-            NSLog(@"访问相册权限受限");
-            [self saveFailImageWithCompletionHandler:completionHandler];
+        switch (authorStatus) {
+            case PHAuthorizationStatusNotDetermined:
+            {
+                [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+                    if (status == PHAuthorizationStatusAuthorized) {
+                        [wself executeMethodWithImageList:imageList andLibraryNmae:libryName whetherOnLine:onLine callBack:completionHandler];
+                    } else {
+                        NSLog(@"访问相册权限受限");
+                        [wself saveFailImageWithCompletionHandler:completionHandler];
+                    }
+                }];
+            }
+                break;
+            case PHAuthorizationStatusAuthorized:
+                [wself executeMethodWithImageList:imageList andLibraryNmae:libryName whetherOnLine:onLine callBack:completionHandler];
+                break;
+            default:
+                NSLog(@"访问相册权限受限");
+                [self saveFailImageWithCompletionHandler:completionHandler];
+                break;
         }
     }
 }
 
-- (void)saveImageListToLibrary:(NSMutableArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName andSaveCallBack:(QhSaveCompletionHandler)completionHandler{
-    __weak QhSavePicToPhotoLibrary *weakSelf = self;
+- (void)executeMethodWithImageList:(NSArray *)imageList andLibraryNmae:(NSString *)libryName whetherOnLine:(BOOL)onLine callBack:(QHSaveCompletionHandler)completionHandler {
+    
+    if (onLine) {
+        [self saveOnLineImageWithAuthorizationToPhotoLibraryWithImageList:imageList andLibraryName:libryName callBack:completionHandler];
+    }else {
+        [self saveImageListToLibrary:[imageList mutableCopy] andLibraryNmae:libryName andSaveCallBack:completionHandler];
+    }
+}
+
+- (void)saveImageListToLibrary:(NSMutableArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName andSaveCallBack:(QHSaveCompletionHandler)completionHandler{
+    __weak __typeof__ (self) wself = self;
 
     if ([imageList count] == 0){
-        
+    
         if (completionHandler) {
             completionHandler(YES);
         }
@@ -165,12 +173,10 @@
     }
 
     UIImage* imagePhoto = [imageList firstObject];
-    
     [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-
         PHAssetCollectionChangeRequest *assetCollectionChangeRequest;
         
-        if (weakSelf.createCollection) {
+        if (wself.createCollection) {
             assetCollectionChangeRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:self.createCollection];
             PHAssetChangeRequest *assetChangeRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:imagePhoto];
             PHObjectPlaceholder *placeholder = [assetChangeRequest placeholderForCreatedAsset];
@@ -184,20 +190,46 @@
             NSLog(@"保存成功");
             [imageList removeObjectAtIndex:0];
         }
-        [weakSelf saveImageListToLibrary:imageList andLibraryNmae:libryName andSaveCallBack:completionHandler];
+        [wself saveImageListToLibrary:imageList andLibraryNmae:libryName andSaveCallBack:completionHandler];
     }];
+}
+
+- (void)saveOnLineImageWithAuthorizationToPhotoLibraryWithImageList:(NSArray <NSString *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(QHSaveCompletionHandler)completionHandler {
+    __weak __typeof__ (self) wself = self;
+
+    self.downloadQueue.maxConcurrentOperationCount = self.maxConcurrentDownloadCount;
+    [self.imagePathList removeAllObjects];
+    
+    NSBlockOperation *finalTask = [NSBlockOperation blockOperationWithBlock:^{
+        __strong __typeof (wself) sself = wself;
+        [sself backgroundSaveImageAndDeleteOldFilesWithLibraryName:libryName callBack:completionHandler];
+    }];
+
+    for (NSInteger i = 0; i < imageUrlList.count; i++) {
+        QHDownloadOperation *task = [[QHDownloadOperation alloc] initWithImageUrlStr:[NSString stringWithFormat:@"%@",imageUrlList[i]] backgroundSupport:self.backgroundDownloadSupport withCompletionHandler:^(BOOL success, NSString * _Nullable filePath, NSError * _Nullable error) {
+            __strong __typeof (wself) sself = wself;
+            
+            if(success && filePath != nil){
+                [sself.imagePathList addObject:filePath];
+            }
+        }];
+        [self.downloadQueue addOperation:task];
+        [finalTask addDependency:task];
+    }
+    [self.downloadQueue addOperation:finalTask];
 }
 
 /**
  * 保存成功后的回调
  */
-- (void)saveSuccessImageWithCompletionHandler:(QhSaveCompletionHandler)completionHandler {
+- (void)saveSuccessImageWithCompletionHandler:(QHSaveCompletionHandler)completionHandler {
    
     if (self.deleteDownloadImageCache) { //删除下载缓存数据
         [self delateOldFiles];
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
+       
         if (completionHandler) {
             completionHandler(YES);
         }
@@ -207,7 +239,7 @@
 /**
  * 保存失败后的回调
  */
-- (void)saveFailImageWithCompletionHandler:(QhSaveCompletionHandler)completionHandler {
+- (void)saveFailImageWithCompletionHandler:(QHSaveCompletionHandler)completionHandler {
     dispatch_async(dispatch_get_main_queue(), ^{
        
         if (completionHandler) {

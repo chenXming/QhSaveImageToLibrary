@@ -1,5 +1,5 @@
 //
-//  QhSavePicToPhotoLibrary.h
+//  QHSavePicToPhotoLibraryManager.h
 //  DownloadPicDemo
 //
 //  Created by 陈小明 on 2021/10/25.
@@ -10,9 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^QhSaveCompletionHandler)(BOOL success);
+typedef void(^QHSaveCompletionHandler)(BOOL success);
 
-@interface QhSavePicToPhotoLibrary : NSObject
+@interface QHSavePicToPhotoLibraryManager : NSObject
 
 /**
  * 网络图片最大同时下载数量
@@ -33,12 +33,17 @@ typedef void(^QhSaveCompletionHandler)(BOOL success);
 @property (nonatomic, assign) BOOL backgroundDownloadSupport;
 
 /**
+ * @brief 获取单例
+ */
++ (nonnull instancetype)sharedInstance;
+
+/**
  * @brief 保存本地图片到相册
  * @param imageList 图片数组
  * @param libryName 相册名称，传空则保存到系统相册
  * @param completionHandler 保存后回调
  */
-- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler;
+- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(QHSaveCompletionHandler)completionHandler;
 
 /**
  * @brief 下载网络图片到相册
@@ -46,7 +51,7 @@ typedef void(^QhSaveCompletionHandler)(BOOL success);
  * @param libryName 相册名称，传空则保存到系统相册
  * @param completionHandler 保存后回调
  */
-- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSURL *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler;
+- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSString *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(QHSaveCompletionHandler)completionHandler;
 
 /**
  * 取消所有下载任务

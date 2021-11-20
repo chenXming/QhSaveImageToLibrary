@@ -1,8 +1,8 @@
 //
-//  QhBaseOperation.h
+//  QHBaseOperation.h
 //  DownloadPicDemo
 //
-//  Created by 陈小明 on 2021/11/19.
+//  Created by 陈小明 on 2021/11/20.
 //
 
 #import <Foundation/Foundation.h>
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface QhBaseOperation : NSOperation
+@interface QHBaseOperation : NSOperation
 
 @property (assign, nonatomic, getter=isExecuting) BOOL executing;
 @property (assign, nonatomic, getter=isFinished) BOOL finished;

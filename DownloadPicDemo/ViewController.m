@@ -6,16 +6,14 @@
 //
 
 #import "ViewController.h"
-#import "QhSavePicToPhotoLibrary.h"
-#import "QhUploadPicToServe.h"
+#import "QHDownloadAndUploadPic.h"
 #import "CXMProgressView.h"
 
-#define   ServeIp      @"https://sm.ms/api/v2/upload"
+#define   ServeIp             @"https://sm.ms/api/v2/upload"
+#define   ServeParameter      @"smfile"
 
-@interface ViewController ()
-
-@property(strong, nonatomic, nonnull) QhSavePicToPhotoLibrary *savePic;
-@property(strong, nonatomic, nonnull) QhUploadPicToServe *upLoadPic;
+@interface ViewController () <UITextFieldDelegate>
+@property (copy, nonatomic) NSString *customLibraryName;
 
 @property (weak, nonatomic) IBOutlet UITextField *customLibraryField;
 @property (weak, nonatomic) IBOutlet UITextField *setMaxCocurrentCountField;
@@ -28,20 +26,41 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.savePic = [[QhSavePicToPhotoLibrary alloc] init];
-    self.upLoadPic = [[QhUploadPicToServe alloc] init];
-
     NSLog(@"%s",__func__);
+    
+    self.title = @"下载上传图片";
+    NSString *appName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
+    self.customLibraryName = appName;
+    
+    self.customLibraryField.delegate = self;
+    self.setMaxCocurrentCountField.delegate = self;
 }  
+
+#pragma mark - UITextField Delegate
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    
+    if ([textField.text isEqualToString:@""]) return;
+    
+    if (textField == self.setMaxCocurrentCountField) {
+        [QHUploadPicToServeManager sharedInstance].maxConcurrentUploadCount = [textField.text integerValue];
+        [QHSavePicToPhotoLibraryManager sharedInstance].maxConcurrentDownloadCount = [textField.text integerValue];
+    }else {
+        self.customLibraryName = [self.customLibraryField.text isEqualToString:@""] ? self.customLibraryName : self.customLibraryField.text;
+    }
+}
+
+#pragma mark - UISwitch Action
 
 - (IBAction)backgroundSwitchAction:(id)sender {
     UISwitch *backgroundSwitch = (UISwitch*)sender;
-    NSLog(@"backgroundSwitch.on==%d",backgroundSwitch.on);
+    [QHSavePicToPhotoLibraryManager sharedInstance].backgroundDownloadSupport = backgroundSwitch.on;
+    [QHUploadPicToServeManager sharedInstance].backgroundUploadSupport = backgroundSwitch.on;
 }
 
 - (IBAction)whetherDeleteCacheSwicthAction:(id)sender {
     UISwitch *whetherDeleateCacheSwitch = (UISwitch*)sender;
-    NSLog(@"backgroundSwitch.on==%d",whetherDeleateCacheSwitch.on);
+    [QHSavePicToPhotoLibraryManager sharedInstance].deleteDownloadImageCache = whetherDeleateCacheSwitch.on;
 }
 
 #pragma mark - UIButton Action
@@ -50,9 +69,15 @@
     __weak __typeof (self) wself = self;
    
     [CXMProgressView showTextWithCircle:@"正在保存"];
-    NSArray *imageList = @[[UIImage imageNamed:@"001.jpg"],[UIImage imageNamed:@"002.jpg"],[UIImage imageNamed:@"003.jpg"],[UIImage imageNamed:@"00003.jpg"],[UIImage imageNamed:@"0004.jpg"],[UIImage imageNamed:@"0005.jpg"],
-                           [UIImage imageNamed:@"00006.jpg"]];
-    [self.savePic saveImageToPhotoLibraryWithImageList:imageList andLibraryName:@"测试2" callBack:^(BOOL success) {
+    NSArray *imageList = @[
+        [UIImage imageNamed:@"001.jpg"],
+        [UIImage imageNamed:@"002.jpg"],
+        [UIImage imageNamed:@"003.jpg"],
+        [UIImage imageNamed:@"004.jpg"],
+        [UIImage imageNamed:@"005.jpg"],
+        [UIImage imageNamed:@"006.jpg"]];
+    
+    [[QHSavePicToPhotoLibraryManager sharedInstance] saveImageToPhotoLibraryWithImageList:imageList andLibraryName:self.customLibraryName callBack:^(BOOL success) {
         __strong __typeof (wself) sself = wself;
         [CXMProgressView dismissLoading];
         
@@ -70,21 +95,19 @@
   
     __weak __typeof (self) wself = self;
     NSArray *imageUrlList = @[
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/pdF3jiDGTxLUPhl.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/OgBpvVI9L6X3qds.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/pdF3jiDGTxLUPhl.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/OgBpvVI9L6X3qds.jpg"],
-        [NSURL URLWithString:@"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg"]
+        @"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg",
+        @"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg",
+        @"https://i.loli.net/2021/11/02/pdF3jiDGTxLUPhl.jpg",
+        @"https://i.loli.net/2021/11/02/OgBpvVI9L6X3qds.jpg",
+        @"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg",
+        @"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg",
+        @"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg",
+        @"https://i.loli.net/2021/11/02/pdF3jiDGTxLUPhl.jpg",
+        @"https://i.loli.net/2021/11/02/OgBpvVI9L6X3qds.jpg",
+        @"https://i.loli.net/2021/11/02/qoyLhApdReSXBxg.jpg"
     ];
     
-    self.savePic = [[QhSavePicToPhotoLibrary alloc] init];
-    self.savePic.maxConcurrentDownloadCount = 3;
-    [self.savePic saveOnLineImageToPhotoLibraryWithImageList:imageUrlList andLibraryName:@"测试2" callBack:^(BOOL success) {
+    [[QHSavePicToPhotoLibraryManager sharedInstance] saveOnLineImageToPhotoLibraryWithImageList:imageUrlList andLibraryName:self.customLibraryName callBack:^(BOOL success) {
         [CXMProgressView dismissLoading];
         __strong __typeof (wself) sself = wself;
         
@@ -101,11 +124,14 @@
     NSLog(@"%s",__func__);
    
     [CXMProgressView showTextWithCircle:@"正在上传"];
-    NSString *imageBundle = [[NSBundle mainBundle] pathForResource:@"test001" ofType:@"png"];
-    NSArray *imageArr = @[imageBundle,imageBundle];
-    self.upLoadPic.maxConcurrentUploadCount = 1;
+    NSString *upLoadImage1 = [[NSBundle mainBundle] pathForResource:@"upLoad_01" ofType:@"png"];
+    NSString *upLoadImage2 = [[NSBundle mainBundle] pathForResource:@"upLoad_02" ofType:@"jpg"];
+    NSString *upLoadImage3 = [[NSBundle mainBundle] pathForResource:@"upLoad_03" ofType:@"jpg"];
+    NSString *upLoadImage4 = [[NSBundle mainBundle] pathForResource:@"upLoad_01" ofType:@"png"];
 
-    [self.upLoadPic uploadImageWithServeIp:ServeIp andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success,NSArray *imageUrlList) {
+    NSArray *imageArr = @[upLoadImage1,upLoadImage2,upLoadImage3,upLoadImage4];
+
+    [[QHUploadPicToServeManager sharedInstance] uploadImageWithServeIp:ServeIp andServeFileParameter:ServeParameter andImagePathList:imageArr withCompletionHandler:^(BOOL success,NSArray *imageUrlList) {
         [CXMProgressView dismissLoading];
         
         if(success){

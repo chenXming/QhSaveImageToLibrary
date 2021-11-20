@@ -1,23 +1,23 @@
 //
-//  DownloadOperation.m
+//  QHDownloadOperation.m
 //  DownloadPicDemo
 //
 //  Created by 陈小明 on 2021/10/21.
 //
 
-#import "QhDownloadOperation.h"
+#import "QHDownloadOperation.h"
 
-@interface QhDownloadOperation()
+@interface QHDownloadOperation()
 
 @property (copy, nonatomic, nullable) NSString *imageUrlStr;
 @property (copy, nonatomic, nullable) NSURLSessionDownloadTask *downloadTask;
-@property (copy, nonatomic, nullable) QhDownloadCompletionHandler completionHandler;
+@property (copy, nonatomic, nullable) QHDownloadCompletionHandler completionHandler;
 
 @end
 
-@implementation QhDownloadOperation
+@implementation QHDownloadOperation
 
-- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(QhDownloadCompletionHandler)completionHandler{
+- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(QHDownloadCompletionHandler)completionHandler{
    
     if (self = [super init]) {
         self.backgroundSupport = background;
