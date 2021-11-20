@@ -81,7 +81,7 @@
     __weak QhSavePicToPhotoLibrary *wself = self;
 
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
-    if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
+    if (!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
         return;
     }
     UIApplication *application = [UIApplication performSelector:@selector(sharedApplication)];
@@ -152,7 +152,7 @@
 - (void)saveImageListToLibrary:(NSMutableArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName andSaveCallBack:(QhSaveCompletionHandler)completionHandler{
     __weak QhSavePicToPhotoLibrary *weakSelf = self;
 
-    if([imageList count] == 0){
+    if ([imageList count] == 0){
         
         if (completionHandler) {
             completionHandler(YES);
@@ -198,7 +198,7 @@
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        if(completionHandler){
+        if (completionHandler) {
             completionHandler(YES);
         }
     });
@@ -210,7 +210,7 @@
 - (void)saveFailImageWithCompletionHandler:(QhSaveCompletionHandler)completionHandler {
     dispatch_async(dispatch_get_main_queue(), ^{
        
-        if(completionHandler){
+        if (completionHandler) {
             completionHandler(NO);
         }
     });
@@ -223,9 +223,9 @@
 - (PHAssetCollection *)createPHAssetLibraryWithName:(NSString *)libraryName{
     NSString *albumName = @"";
    
-    if(libraryName == nil || [libraryName isEqualToString:@""]){
+    if (libraryName == nil || [libraryName isEqualToString:@""]) {
         albumName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
-    }else{
+    } else {
         albumName = libraryName;
     }
 
@@ -262,7 +262,7 @@
  */
 - (void)cancelAllDownloads {
    
-    if(self.downloadQueue){
+    if (self.downloadQueue) {
         [self.downloadQueue cancelAllOperations];
     }
     
@@ -271,7 +271,7 @@
 
 - (void)delateOldFiles {
    
-    if(self.imagePathList.count > 0){
+    if (self.imagePathList.count > 0) {
         [self.imagePathList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             [[NSFileManager defaultManager] removeItemAtPath:(NSString *)obj error:nil];
         }];

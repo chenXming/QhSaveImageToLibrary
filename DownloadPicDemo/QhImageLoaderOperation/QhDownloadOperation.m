@@ -18,10 +18,12 @@
 @implementation QhDownloadOperation
 
 - (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(QhDownloadCompletionHandler)completionHandler{
-    if(self = [super init]){
+   
+    if (self = [super init]) {
         self.backgroundSupport = background;
         self.imageUrlStr = imageUrlStr;
-        if(completionHandler){
+       
+        if (completionHandler) {
             self.completionHandler = completionHandler;
         }
     }
@@ -38,7 +40,7 @@
     
     self.downloadTask = [self.session downloadTaskWithRequest:request completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         
-        if(error == nil){
+        if (error == nil) {
             NSString *cache = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES)  lastObject];
             NSString *filePath = [cache stringByAppendingPathComponent:response.suggestedFilename];
             NSLog(@"filePath = %@",filePath);
@@ -53,7 +55,7 @@
     
     self.executing = YES;
 
-    if(self.downloadTask) {
+    if (self.downloadTask) {
         [self.downloadTask resume];
     } else {
         self.completionHandler(NO, nil, [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:@{NSLocalizedDescriptionKey : @"Task can't be initialized"}]);

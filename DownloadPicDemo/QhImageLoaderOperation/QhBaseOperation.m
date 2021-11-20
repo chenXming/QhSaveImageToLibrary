@@ -13,6 +13,7 @@
 
 - (instancetype)init{
     self = [super init];
+    
     if (self) {
         self.backgroundSupport = YES;
         [self initSession];
@@ -22,7 +23,7 @@
 
 - (void)initSession {
    
-    if(!self.session){
+    if (!self.session) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
         configuration.timeoutIntervalForRequest = 15;
         configuration.allowsCellularAccess = YES;
@@ -96,6 +97,7 @@
 - (void)cancelLoad {
    
     if (self.isFinished) return;
+    
     [super cancel];
     [self cancelTask];
     

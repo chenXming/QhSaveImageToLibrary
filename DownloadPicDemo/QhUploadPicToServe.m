@@ -47,7 +47,7 @@
         QhUploadOperation *task = [[QhUploadOperation alloc] initWithServeIp:serveIp andServeFileParameter:serveFileParameter andImageUrlStr:imagePathList[i] backgroundSupport:self.backgroundUploadSupport withCompletionHandler:^(BOOL success,NSString * _Nullable imageUrl, NSError * _Nullable error) {
             __strong __typeof (wself) sself = wself;
 
-            if(success && imageUrl){
+            if (success && imageUrl) {
                 [sself.imageUrlList addObject:imageUrl];
             } else {
                 [sself.imageUrlList addObject:error.localizedDescription];
@@ -62,7 +62,7 @@
 - (void)allImageUploadComplate:(QhLoadCompletionHandler)completionHandler{
     dispatch_async(dispatch_get_main_queue(), ^{
        
-        if(completionHandler){
+        if (completionHandler) {
             completionHandler(YES,self.imageUrlList);
         }
     });
@@ -72,7 +72,7 @@
  */
 - (void)cancelAllUpload {
    
-    if(self.uploadQueue){
+    if (self.uploadQueue) {
         [self.uploadQueue cancelAllOperations];
     }
 }

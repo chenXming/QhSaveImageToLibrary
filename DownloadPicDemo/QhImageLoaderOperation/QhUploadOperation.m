@@ -53,22 +53,22 @@
         
         __strong __typeof (wself) sself = wself;
         // 解析服务器返回的数据
-        if(error == nil) {
+        if (error == nil) {
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
             NSLog(@"jsonDict==%@",jsonDict);
             NSString *imageUrl = @"";
-            if([jsonDict[@"data"] isKindOfClass:[NSDictionary class]]){
+            if ([jsonDict[@"data"] isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *dataDict = jsonDict[@"data"];
                 imageUrl = dataDict[@"url"];
             } else {
                 imageUrl = jsonDict[@"images"];
             }
             
-            if(sself.completionHandler){
+            if (sself.completionHandler) {
                 sself.completionHandler(YES,imageUrl,nil);
             }
         } else {
-            if(sself.completionHandler){
+            if (sself.completionHandler) {
                 sself.completionHandler(NO,nil,error);
             }
         }
@@ -77,7 +77,7 @@
     
     self.executing = YES;
     
-    if(self.uploadTask) {
+    if (self.uploadTask) {
         [self.uploadTask resume];
     } else {
         self.completionHandler(NO,nil, [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:@{NSLocalizedDescriptionKey : @"Task can't be initialized"}]);
@@ -91,18 +91,21 @@
  */
 - (NSData *)getUploadDataWithParameter:(NSString *)serveFileParameter{
     NSMutableData *data = [NSMutableData data];
-    
     [data appendData:Encode(@"--")];
     [data appendData:Encode(Boundary)];
     [data appendData:Enter];
+    
     NSString *imageContent = [NSString stringWithFormat:@"Content-Disposition:form-data; name=\"%@\"; filename=\"%@\"",serveFileParameter,[self getImageFileName]];
+    
     [data appendData:Encode(imageContent)];
     [data appendData:Enter];
     [data appendData:Encode(@"Content-Type:image/png")];
     [data appendData:Enter];
     [data appendData:Enter];
-    UIImage * image = [UIImage imageWithContentsOfFile:self.imageLocalUrl];
+    
+    UIImage *image = [UIImage imageWithContentsOfFile:self.imageLocalUrl];
     NSData *imageData = [UIImage getDataWithImage:image];
+    
     [data appendData:imageData];
     [data appendData:Enter];
     [data appendData:Encode(@"--")];
@@ -116,11 +119,11 @@
 - (NSString *)getImageFileName{
     NSString *fileName = @"qhImage.png";
     
-    if(self.imageLocalUrl == nil) return fileName;
+    if (self.imageLocalUrl == nil) return fileName;
 
     NSArray *fileNameArr = [self.imageLocalUrl componentsSeparatedByString:@"/"];
    
-    if(fileNameArr.count > 0){
+    if (fileNameArr.count > 0) {
         fileName = [fileNameArr lastObject];
     }
     return  fileName;
