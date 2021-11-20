@@ -19,6 +19,7 @@
 
 - (instancetype)init {
     self = [super init];
+   
     if (self) {
         self.maxConcurrentUploadCount = 5;
         self.backgroundUploadSupport = YES;
@@ -30,8 +31,7 @@
 /**
  * @brief 上传图片到服务端
  */
-- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(LoadCompletionHandler)completionHandler {
-    
+- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(QhLoadCompletionHandler)completionHandler {
     __weak QhUploadPicToServe *wself = self;
 
     self.uploadQueue = [[NSOperationQueue alloc] init];
@@ -59,11 +59,13 @@
     [self.uploadQueue addOperation:finalTask];
 }
 
-- (void)allImageUploadComplate:(LoadCompletionHandler)completionHandler{
-    
-    if(completionHandler){
-        completionHandler(YES,self.imageUrlList);
-    }
+- (void)allImageUploadComplate:(QhLoadCompletionHandler)completionHandler{
+    dispatch_async(dispatch_get_main_queue(), ^{
+       
+        if(completionHandler){
+            completionHandler(YES,self.imageUrlList);
+        }
+    });
 }
 /**
  * 取消所有上传任务

@@ -11,14 +11,13 @@
 
 @property (copy, nonatomic, nullable) NSString *imageUrlStr;
 @property (copy, nonatomic, nullable) NSURLSessionDownloadTask *downloadTask;
-@property (copy, nonatomic, nullable) DownloadCompletionHandler completionHandler;
+@property (copy, nonatomic, nullable) QhDownloadCompletionHandler completionHandler;
 
 @end
 
 @implementation QhDownloadOperation
 
-- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(DownloadCompletionHandler)completionHandler{
-
+- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(QhDownloadCompletionHandler)completionHandler{
     if(self = [super init]){
         self.backgroundSupport = background;
         self.imageUrlStr = imageUrlStr;

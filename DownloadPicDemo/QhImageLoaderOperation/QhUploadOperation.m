@@ -18,14 +18,14 @@
 @property (copy, nonatomic, nullable) NSString *imageLocalUrl;
 @property (copy, nonatomic, nullable) NSString *serveFileParameter;
 @property (copy, nonatomic, nullable) NSURLSessionUploadTask *uploadTask;
-@property (copy, nonatomic, nullable) UploadCompletionHandler completionHandler;
+@property (copy, nonatomic, nullable) QhUploadCompletionHandler completionHandler;
 
 @end
 
 @implementation QhUploadOperation
 
-- (instancetype)initWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImageUrlStr:(NSString *)imageLocalUrl backgroundSupport:(BOOL)background withCompletionHandler:(UploadCompletionHandler)completionHandler {
-
+- (instancetype)initWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImageUrlStr:(NSString *)imageLocalUrl backgroundSupport:(BOOL)background withCompletionHandler:(QhUploadCompletionHandler)completionHandler {
+    
     if(self = [super init]){
         self.serveIp = serveIp;
         self.imageLocalUrl = imageLocalUrl;
@@ -40,7 +40,6 @@
 }
 
 - (void)startTask{
-
     __weak __typeof__ (self) wself = self;
 
     NSURL *url = [NSURL URLWithString:_serveIp];
@@ -91,8 +90,8 @@
  * 拼接上传数据
  */
 - (NSData *)getUploadDataWithParameter:(NSString *)serveFileParameter{
-    
     NSMutableData *data = [NSMutableData data];
+    
     [data appendData:Encode(@"--")];
     [data appendData:Encode(Boundary)];
     [data appendData:Enter];
@@ -115,11 +114,12 @@
 }
 
 - (NSString *)getImageFileName{
-    
     NSString *fileName = @"qhImage.png";
-    if(self.imageLocalUrl == nil) return fileName;
     
+    if(self.imageLocalUrl == nil) return fileName;
+
     NSArray *fileNameArr = [self.imageLocalUrl componentsSeparatedByString:@"/"];
+   
     if(fileNameArr.count > 0){
         fileName = [fileNameArr lastObject];
     }
@@ -127,6 +127,7 @@
 }
 
 - (void)cancelTask {
+    
     if (self.uploadTask) {
         [self.uploadTask cancel];
         self.uploadTask = nil;

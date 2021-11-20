@@ -22,6 +22,7 @@
 
 - (instancetype)init {
     self = [super init];
+   
     if (self) {
         self.maxConcurrentDownloadCount = 5;
         self.deleteDownloadImageCache = YES;
@@ -37,9 +38,9 @@
  * @param libryName 相册名称，默认为应用名
  * @param completionHandler 保存后回调
  */
-- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler {
+- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler {
 
-    return [self saveImageToPhotoWithRequestAuthorizationWithImageList:imageList andLibraryNmae:libryName callBack:(SaveCompletionHandler)completionHandler];
+    return [self saveImageToPhotoWithRequestAuthorizationWithImageList:imageList andLibraryNmae:libryName callBack:(QhSaveCompletionHandler)completionHandler];
 }
 
 /**
@@ -48,8 +49,7 @@
  * @param libryName 相册名称，默认为应用名
  * @param completionHandler 保存后回调
  */
-- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSURL *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler {
-    
+- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSURL *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler {
     __weak QhSavePicToPhotoLibrary *wself = self;
 
     self.downloadQueue = [[NSOperationQueue alloc] init];
@@ -77,8 +77,7 @@
 /**
  * 后台保存任务
  */
-- (void)backgroundSaveImageAndDeleteOldFilesWithLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler {
-    
+- (void)backgroundSaveImageAndDeleteOldFilesWithLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler {
     __weak QhSavePicToPhotoLibrary *wself = self;
 
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
@@ -106,8 +105,7 @@
     }];
 }
 
-- (void)saveImageToPhotoWithRequestAuthorizationWithImageList:(NSArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler{
-        
+- (void)saveImageToPhotoWithRequestAuthorizationWithImageList:(NSArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler{
     __weak QhSavePicToPhotoLibrary *weakSelf = self;
     
     if (@available(iOS 14, *)) {
@@ -151,8 +149,7 @@
     }
 }
 
-- (void)saveImageListToLibrary:(NSMutableArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName andSaveCallBack:(SaveCompletionHandler)completionHandler{
-    
+- (void)saveImageListToLibrary:(NSMutableArray <UIImage *> *)imageList andLibraryNmae:(NSString *)libryName andSaveCallBack:(QhSaveCompletionHandler)completionHandler{
     __weak QhSavePicToPhotoLibrary *weakSelf = self;
 
     if([imageList count] == 0){
@@ -194,33 +191,38 @@
 /**
  * 保存成功后的回调
  */
-- (void)saveSuccessImageWithCompletionHandler:(SaveCompletionHandler)completionHandler {
-    
+- (void)saveSuccessImageWithCompletionHandler:(QhSaveCompletionHandler)completionHandler {
+   
     if (self.deleteDownloadImageCache) { //删除下载缓存数据
         [self delateOldFiles];
     }
-        
-    if(completionHandler){
-        completionHandler(YES);
-    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if(completionHandler){
+            completionHandler(YES);
+        }
+    });
 }
 
 /**
  * 保存失败后的回调
  */
-- (void)saveFailImageWithCompletionHandler:(SaveCompletionHandler)completionHandler {
+- (void)saveFailImageWithCompletionHandler:(QhSaveCompletionHandler)completionHandler {
+    dispatch_async(dispatch_get_main_queue(), ^{
+       
+        if(completionHandler){
+            completionHandler(NO);
+        }
+    });
     
-    if(completionHandler){
-        completionHandler(NO);
-    }
 }
 
 /**
  * 创建用户自定义相册
 */
 - (PHAssetCollection *)createPHAssetLibraryWithName:(NSString *)libraryName{
-
     NSString *albumName = @"";
+   
     if(libraryName == nil || [libraryName isEqualToString:@""]){
         albumName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
     }else{
@@ -259,7 +261,7 @@
  * 取消所有下载任务
  */
 - (void)cancelAllDownloads {
-    
+   
     if(self.downloadQueue){
         [self.downloadQueue cancelAllOperations];
     }
@@ -268,7 +270,7 @@
 }
 
 - (void)delateOldFiles {
-    
+   
     if(self.imagePathList.count > 0){
         [self.imagePathList enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             [[NSFileManager defaultManager] removeItemAtPath:(NSString *)obj error:nil];
@@ -278,7 +280,6 @@
 }
 
 - (void)dealloc {
- 
     [self.downloadQueue cancelAllOperations];
 }
 @end

@@ -173,6 +173,7 @@
 		5FB7A8872748910F00A021EF /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				5FB7A8942748968700A021EF /* Category */,
 				5FB7A8882748916B00A021EF /* CXMProgressView */,
 			);
 			path = Utils;
@@ -181,14 +182,23 @@
 		5FB7A8882748916B00A021EF /* CXMProgressView */ = {
 			isa = PBXGroup;
 			children = (
-				5FB7A8892748916B00A021EF /* progressView_success@3x.png */,
 				5FB7A88A2748916B00A021EF /* progressView_success@2x.png */,
+				5FB7A8892748916B00A021EF /* progressView_success@3x.png */,
 				5FB7A88C2748916B00A021EF /* progressView_error@2x.png */,
 				5FB7A88E2748916B00A021EF /* progressView_error@3x.png */,
 				5FB7A88D2748916B00A021EF /* CXMProgressView.h */,
 				5FB7A88B2748916B00A021EF /* CXMProgressView.m */,
 			);
 			path = CXMProgressView;
+			sourceTree = "<group>";
+		};
+		5FB7A8942748968700A021EF /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				5F2FB29927465DED00FAC126 /* UIImage+ImageContent.h */,
+				5F2FB29A27465DED00FAC126 /* UIImage+ImageContent.m */,
+			);
+			path = Category;
 			sourceTree = "<group>";
 		};
 		5FFBCC122721612B0080F7AE = {
@@ -267,8 +277,6 @@
 				5FFBCC68272168160080F7AE /* QhDownloadOperation.m */,
 				5F2FB28E2744EE7F00FAC126 /* QhUploadOperation.h */,
 				5F2FB28F2744EE7F00FAC126 /* QhUploadOperation.m */,
-				5F2FB29927465DED00FAC126 /* UIImage+ImageContent.h */,
-				5F2FB29A27465DED00FAC126 /* UIImage+ImageContent.m */,
 			);
 			path = QhImageLoaderOperation;
 			sourceTree = "<group>";

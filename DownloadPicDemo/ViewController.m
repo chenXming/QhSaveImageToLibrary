@@ -48,6 +48,7 @@
 
 - (IBAction)saveLocalImageToCustomLibraryClick:(id)sender {
     __weak __typeof (self) wself = self;
+   
     [CXMProgressView showTextWithCircle:@"正在保存"];
     NSArray *imageList = @[[UIImage imageNamed:@"001.jpg"],[UIImage imageNamed:@"002.jpg"],[UIImage imageNamed:@"003.jpg"],[UIImage imageNamed:@"00003.jpg"],[UIImage imageNamed:@"0004.jpg"],[UIImage imageNamed:@"0005.jpg"],
                            [UIImage imageNamed:@"00006.jpg"]];
@@ -66,6 +67,7 @@
 
 - (IBAction)downloadImageToLibraryClick:(id)sender {
     [CXMProgressView showTextWithCircle:@"正在下载"];
+  
     __weak __typeof (self) wself = self;
     NSArray *imageUrlList = @[[NSURL URLWithString:@"https://i.loli.net/2021/11/02/aYnZxByIC4u1GFX.jpg"],
                               [NSURL URLWithString:@"https://i.loli.net/2021/11/02/2YMvcEGSZqAefRQ.jpg"],
@@ -95,6 +97,7 @@
 
 - (IBAction)upLoadImageListToServerClick:(id)sender {
     NSLog(@"%s",__func__);
+   
     [CXMProgressView showTextWithCircle:@"正在上传"];
     NSString *imageBundle = [[NSBundle mainBundle] pathForResource:@"test001" ofType:@"png"];
     NSArray *imageArr = @[imageBundle,imageBundle];
@@ -102,6 +105,7 @@
 
     [self.upLoadPic uploadImageWithServeIp:ServeIp andServeFileParameter:@"smfile" andImagePathList:imageArr withCompletionHandler:^(BOOL success,NSArray *imageUrlList) {
         [CXMProgressView dismissLoading];
+        
         if(success){
             [CXMProgressView showSuccessText:@"上传成功"];
             NSLog(@"imageUrlList=%@",imageUrlList);

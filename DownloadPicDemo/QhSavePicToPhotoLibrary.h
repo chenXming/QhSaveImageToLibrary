@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^SaveCompletionHandler)(BOOL success);
+typedef void(^QhSaveCompletionHandler)(BOOL success);
 
 @interface QhSavePicToPhotoLibrary : NSObject
 
@@ -38,7 +38,7 @@ typedef void(^SaveCompletionHandler)(BOOL success);
  * @param libryName 相册名称，传空则保存到系统相册
  * @param completionHandler 保存后回调
  */
-- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler;
+- (void)saveImageToPhotoLibraryWithImageList:(NSArray <UIImage *> *)imageList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler;
 
 /**
  * @brief 下载网络图片到相册
@@ -46,7 +46,7 @@ typedef void(^SaveCompletionHandler)(BOOL success);
  * @param libryName 相册名称，传空则保存到系统相册
  * @param completionHandler 保存后回调
  */
-- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSURL *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(SaveCompletionHandler)completionHandler;
+- (void)saveOnLineImageToPhotoLibraryWithImageList:(NSArray <NSURL *> *)imageUrlList andLibraryName:(NSString *)libryName callBack:(QhSaveCompletionHandler)completionHandler;
 
 /**
  * 取消所有下载任务

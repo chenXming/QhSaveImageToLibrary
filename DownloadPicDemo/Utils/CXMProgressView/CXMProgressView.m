@@ -29,7 +29,6 @@
 }
 
 - (void)makeCustomHUD{
-    
     [self.class dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -61,7 +60,6 @@
 }
 
 - (void)hiddenInstanceHUD{
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.class dismissLoading];
         [self.hudInsteracne hideAnimated:YES];
@@ -69,7 +67,6 @@
 }
 
 + (void)showTextWithCircle:(NSString *)aText{
-    
     [self dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -88,7 +85,6 @@
 }
 
 + (void)showText:(NSString *)aText{
-    
     [self dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -134,7 +130,6 @@
 }
 
 + (void)showErrorText:(NSString *)aText{
-    
     [self dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -158,7 +153,6 @@
 }
 
 + (void)showSuccessText:(NSString *)aText{
-    
     [self dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -195,7 +189,6 @@
 }
 
 + (void)showText:(NSString *)aText hideComplete:(ProgressHideComplete)complete{
-    
     [self dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -227,7 +220,6 @@
 }
 
 + (void)showErrorText:(NSString *)aText hideComplete:(ProgressHideComplete)complete{
-    
     [self dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -263,7 +255,6 @@
 }
 
 + (void)showSuccessText:(NSString *)aText hideComplete:(ProgressHideComplete)complete{
-    
     [self dismissLoading];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -299,7 +290,6 @@
 }
 
 + (UIViewController *)getCurrentViewController {
-   
     UIViewController *result = nil;
     UIWindow * window = [[UIApplication sharedApplication] keyWindow];
    

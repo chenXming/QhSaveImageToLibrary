@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^UploadCompletionHandler)(BOOL success, NSString * __nullable imageUrl, NSError * __nullable error);
+typedef void(^QhUploadCompletionHandler)(BOOL success, NSString * __nullable imageUrl, NSError * __nullable error);
 
 @interface QhUploadOperation : QhBaseOperation
 
@@ -20,7 +20,7 @@ typedef void(^UploadCompletionHandler)(BOOL success, NSString * __nullable image
  * @param background 是否支持后台上传
  * @param completionHandler 上传完成后回调
  */
-- (instancetype)initWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImageUrlStr:(NSString *)imageLocalUrl backgroundSupport:(BOOL)background withCompletionHandler:(UploadCompletionHandler)completionHandler;
+- (instancetype)initWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImageUrlStr:(NSString *)imageLocalUrl backgroundSupport:(BOOL)background withCompletionHandler:(QhUploadCompletionHandler)completionHandler;
 
 /**
  *@brief 取消当前任务

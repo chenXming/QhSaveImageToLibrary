@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^LoadCompletionHandler)(BOOL success , NSArray *imageUrlList);
+typedef void(^QhLoadCompletionHandler)(BOOL success , NSArray *imageUrlList);
 
 @interface QhUploadPicToServe : NSObject
 
@@ -32,7 +32,7 @@ typedef void(^LoadCompletionHandler)(BOOL success , NSArray *imageUrlList);
  * @param imagePathList 图片路径list
  * @param completionHandler 完成后回调
  */
-- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(LoadCompletionHandler)completionHandler;
+- (void)uploadImageWithServeIp:(NSString *)serveIp andServeFileParameter:(NSString *)serveFileParameter andImagePathList:(NSArray *)imagePathList withCompletionHandler:(QhLoadCompletionHandler)completionHandler;
 
 /**
  * 取消所有上传任务

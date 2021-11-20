@@ -11,8 +11,7 @@
 @synthesize executing = _executing;
 @synthesize finished = _finished;
 
-- (instancetype)init
-{
+- (instancetype)init{
     self = [super init];
     if (self) {
         self.backgroundSupport = YES;
@@ -22,7 +21,7 @@
 }
 
 - (void)initSession {
-    
+   
     if(!self.session){
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
         configuration.timeoutIntervalForRequest = 15;
@@ -32,7 +31,7 @@
     }
 }
 - (void)start{
-    
+   
     if (self.isCancelled){
         self.executing = NO;
         self.finished = YES;
@@ -59,24 +58,19 @@
     [self startTask];
 }
 
-- (void)startTask {
-    
-}
+- (void)startTask {}
 
 - (void)setExecuting:(BOOL )executing{
-
     [self willChangeValueForKey:@"isExecuting"];
     _executing = executing;
     [self didChangeValueForKey:@"isExecuting"];
 }
 
 - (BOOL)isExecuting{
-    
     return _executing;
 }
 
 - (void)done {
-    
     Class UIApplicationClass = NSClassFromString(@"UIApplication");
     
     if(!UIApplicationClass || ![UIApplicationClass respondsToSelector:@selector(sharedApplication)]) {
@@ -94,14 +88,13 @@
 }
 
 - (void)cancel {
-    
     @synchronized (self) {
         [self cancelLoad];
     }
 }
 
 - (void)cancelLoad {
-        
+   
     if (self.isFinished) return;
     [super cancel];
     [self cancelTask];
@@ -113,25 +106,20 @@
 }
 
 - (void)setFinished:(BOOL )finished{
-   
     [self willChangeValueForKey:@"isFinished"];
     _finished = finished;
     [self didChangeValueForKey:@"isFinished"];
 }
 
 - (BOOL)isFinished{
-    
     return _finished;
 }
 
 - (BOOL)isConcurrent {
-    
     return YES;
 }
 
-- (void)cancelTask{
-    
-}
+- (void)cancelTask{}
 
 - (void)dealloc{
     NSLog(@"任务释放了:::");

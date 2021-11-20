@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^DownloadCompletionHandler)(BOOL success , NSString * __nullable filePath, NSError * __nullable error);
+typedef void(^QhDownloadCompletionHandler)(BOOL success , NSString * __nullable filePath, NSError * __nullable error);
 
 @interface QhDownloadOperation : QhBaseOperation
 
@@ -20,7 +20,7 @@ typedef void(^DownloadCompletionHandler)(BOOL success , NSString * __nullable fi
  * @param background 是否支持后台下载
  * @param completionHandler 下载完成后回调
  */
-- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(DownloadCompletionHandler)completionHandler;
+- (instancetype)initWithImageUrlStr:(NSString *)imageUrlStr backgroundSupport:(BOOL)background withCompletionHandler:(QhDownloadCompletionHandler)completionHandler;
 
 /**
  *@brief 取消当前下载任务
