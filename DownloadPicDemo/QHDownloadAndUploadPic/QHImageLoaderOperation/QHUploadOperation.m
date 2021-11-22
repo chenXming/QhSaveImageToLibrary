@@ -8,9 +8,9 @@
 #import "QHUploadOperation.h"
 #import "UIImage+ImageContent.h"
 
-#define Boundary @"QHUploadImage"
-#define Enter [@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]
-#define Encode(string) [string dataUsingEncoding:NSUTF8StringEncoding]
+#define QHBoundary @"QHUploadImage"
+#define QHEnter [@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]
+#define QHEncode(string) [string dataUsingEncoding:NSUTF8StringEncoding]
 
 @interface QHUploadOperation()
 
@@ -44,7 +44,7 @@
 
     NSURL *url = [NSURL URLWithString:_serveIp];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    NSString *head = [NSString stringWithFormat:@"multipart/form-data;boundary=%@",Boundary];
+    NSString *head = [NSString stringWithFormat:@"multipart/form-data;boundary=%@",QHBoundary];
     [request setValue:head forHTTPHeaderField:@"Content-Type"];
     request.HTTPMethod = @"POST";
     
@@ -92,27 +92,27 @@
  */
 - (NSData *)getUploadDataWithParameter:(NSString *)serveFileParameter{
     NSMutableData *data = [NSMutableData data];
-    [data appendData:Encode(@"--")];
-    [data appendData:Encode(Boundary)];
-    [data appendData:Enter];
+    [data appendData:QHEncode(@"--")];
+    [data appendData:QHEncode(QHBoundary)];
+    [data appendData:QHEnter];
     
     NSString *imageContent = [NSString stringWithFormat:@"Content-Disposition:form-data; name=\"%@\"; filename=\"%@\"",serveFileParameter,[self getImageFileName]];
     
-    [data appendData:Encode(imageContent)];
-    [data appendData:Enter];
-    [data appendData:Encode(@"Content-Type:image/png")];
-    [data appendData:Enter];
-    [data appendData:Enter];
+    [data appendData:QHEncode(imageContent)];
+    [data appendData:QHEnter];
+    [data appendData:QHEncode(@"Content-Type:image/png")];
+    [data appendData:QHEnter];
+    [data appendData:QHEnter];
     
     UIImage *image = [UIImage imageWithContentsOfFile:self.imageLocalUrl];
     NSData *imageData = [UIImage getDataWithImage:image];
     
     [data appendData:imageData];
-    [data appendData:Enter];
-    [data appendData:Encode(@"--")];
-    [data appendData:Encode(Boundary)];
-    [data appendData:Encode(@"--")];
-    [data appendData:Enter];
+    [data appendData:QHEnter];
+    [data appendData:QHEncode(@"--")];
+    [data appendData:QHEncode(QHBoundary)];
+    [data appendData:QHEncode(@"--")];
+    [data appendData:QHEnter];
     
     return data;
 }

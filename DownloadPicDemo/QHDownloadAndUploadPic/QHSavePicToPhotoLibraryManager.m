@@ -11,8 +11,8 @@
 
 
 @interface QHSavePicToPhotoLibraryManager ()
-//自定义相册
-@property (strong, nonatomic, nonnull) PHAssetCollection *createCollection;
+
+@property (strong, nonatomic, nonnull) PHAssetCollection *createCollection;//自定义相册
 @property (strong, nonatomic, nonnull) NSMutableArray    *imagePathList;
 @property (strong, nonatomic, nonnull) NSOperationQueue  *downloadQueue;
 
